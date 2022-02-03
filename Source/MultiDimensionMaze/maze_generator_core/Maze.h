@@ -31,7 +31,6 @@ public:
 	bool isPosInMaze(Position pos);
 	bool getPassage(Position pos, Direction dir);
 	void setPassage(Position pos, Direction dir, bool value);
-	Position getStart();
 	Position getEnd();
 	Direction getHintAt(Position pos);
 	void solve();
