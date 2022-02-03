@@ -1,7 +1,7 @@
 # MultiDimensionalMaze
-This is a (up to) six dimensional maze. There are three visual dimensions -<br/>
-     x (cyan), y (magenta), z (yellow), and three unseen dimensions -<br/>
-     u (red), v (green), w (blue).<br/>
+This is a (up to) six dimensional maze. There are three visual dimensions -  
+     x (cyan), y (magenta), z (yellow), and three unseen dimensions -  
+     u (red), v (green), w (blue).  
 To move forward, press and hold the mouse button. Then release the mouse button to stop.<br/>
 To turn left ![Image](Icon-pictures.png "icon"), right ![Image](Icon-pictures.png "icon"), up ![Image](Icon-pictures.png "icon"), down ![Image](Icon-pictures.png "icon"), or reverse ![Image](Icon-pictures.png "icon"), click on that icon in<br/>
      the upper right. The icon will be white if there is a path in that direction,<br/>
