@@ -243,14 +243,23 @@ void AMazeBuild::ProcessCell(Position pos) {
 	DimensionText(pos);
 }
 
+void AMazeBuild::clearBuild() {
+	TArray<UActorComponent*> components = this->GetInstanceComponents();
+	for (UActorComponent* component : components) {
+		this->RemoveInstanceComponent(component);
+		component->DestroyComponent();
+	}
+	walls.clear();
+	dimensionLetter.clear();
+	dimensionLetters.clear();
+}
+
 /**
  * Display the new Maze.
  *
  */
 void AMazeBuild::DisplayMaze() {
-	walls.clear();
-	dimensionLetter.clear();
-	dimensionLetters.clear();
+	clearBuild();
 	walls.resize(GetMaze().getMaxDimension()+1);
 	dimensionLetters.resize(GetMaze().getMaxDimension() + 1);
 	dimensionLetter.resize(GetMaze().getMaxDimension() + 1);
@@ -412,15 +421,6 @@ Position AMazeBuild::locationToPosition(int u, int v, int w, FVector location) {
  */
 Maze AMazeBuild::GetMaze() {
 	return _maze;
-}
-
-/**
- * Scale (resize) the end termination to the specified size.
- *
- * @param {float} scale
- */
-void AMazeBuild::scaleEndTermination(float scale) {
-	endTermination->SetWorldScale3D(FVector(scale, scale, scale));
 }
 
 /**
