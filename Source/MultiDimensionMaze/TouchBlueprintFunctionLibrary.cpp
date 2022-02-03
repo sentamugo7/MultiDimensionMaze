@@ -14,13 +14,12 @@ FRotator UTouchBlueprintFunctionLibrary::_playerRotator = INIT_PLAYER_ROTATION;
 AController* UTouchBlueprintFunctionLibrary::_playerController;
 FVector UTouchBlueprintFunctionLibrary::_playerForward = INIT_PLAYER_FORWARD;
 Position UTouchBlueprintFunctionLibrary::_playerPosition = START;
-FString UTouchBlueprintFunctionLibrary::_debugText;
 FVector UTouchBlueprintFunctionLibrary::PLAYER_UP = FVector(0, 0, 1);
 
 int UTouchBlueprintFunctionLibrary::_u_size = 1;//DEFAULT_DIMENSION_SIZE;
 int UTouchBlueprintFunctionLibrary::_v_size = 1;// DEFAULT_DIMENSION_SIZE;
 int UTouchBlueprintFunctionLibrary::_w_size = 1;// DEFAULT_DIMENSION_SIZE;
-int UTouchBlueprintFunctionLibrary::_depth = DEFAULT_DIMENSION_SIZE;
+int UTouchBlueprintFunctionLibrary::_depth = 1;
 int UTouchBlueprintFunctionLibrary::_height = DEFAULT_DIMENSION_SIZE;
 int UTouchBlueprintFunctionLibrary::_width = DEFAULT_DIMENSION_SIZE;
 float UTouchBlueprintFunctionLibrary::_playerSpeed = DEFAULT_PLAYER_SPEED;
@@ -195,7 +194,6 @@ bool UTouchBlueprintFunctionLibrary::isDown() {
  */
 void UTouchBlueprintFunctionLibrary::clickUPlus() {
     _playerPosition = _mazeBuild->MoveDimension(_playerPosition, U_PLUS);
-    _debugText += FString::Printf(TEXT(" MOVETO (%i,%i,%i,%i,%i,%i) ==== "), _playerPosition.getU(), _playerPosition.getV(), _playerPosition.getW(), _playerPosition.getZ(), _playerPosition.getY(), _playerPosition.getX());
 }
 
 /**
@@ -204,7 +202,6 @@ void UTouchBlueprintFunctionLibrary::clickUPlus() {
  */
 void UTouchBlueprintFunctionLibrary::clickUMinus() {
     _playerPosition = _mazeBuild->MoveDimension(_playerPosition, U_MINUS);
-    _debugText += FString::Printf(TEXT(" MOVETO (%i,%i,%i,%i,%i,%i) ==== "), _playerPosition.getU(), _playerPosition.getV(), _playerPosition.getW(), _playerPosition.getZ(), _playerPosition.getY(), _playerPosition.getX());
 }
 
 /**
@@ -213,7 +210,6 @@ void UTouchBlueprintFunctionLibrary::clickUMinus() {
  */
 void UTouchBlueprintFunctionLibrary::clickVPlus() {
     _playerPosition = _mazeBuild->MoveDimension(_playerPosition, V_PLUS);
-    _debugText += FString::Printf(TEXT(" MOVETO (%i,%i,%i,%i,%i,%i) ==== "), _playerPosition.getU(), _playerPosition.getV(), _playerPosition.getW(), _playerPosition.getZ(), _playerPosition.getY(), _playerPosition.getX());
 }
 
 /**
@@ -222,7 +218,6 @@ void UTouchBlueprintFunctionLibrary::clickVPlus() {
  */
 void UTouchBlueprintFunctionLibrary::clickVMinus() {
     _playerPosition = _mazeBuild->MoveDimension(_playerPosition, V_MINUS);
-    _debugText += FString::Printf(TEXT(" MOVETO (%i,%i,%i,%i,%i,%i) ==== "), _playerPosition.getU(), _playerPosition.getV(), _playerPosition.getW(), _playerPosition.getZ(), _playerPosition.getY(), _playerPosition.getX());
 }
 
 /**
@@ -231,7 +226,6 @@ void UTouchBlueprintFunctionLibrary::clickVMinus() {
  */
 void UTouchBlueprintFunctionLibrary::clickWPlus() {
     _playerPosition = _mazeBuild->MoveDimension(_playerPosition, W_PLUS);
-    _debugText += FString::Printf(TEXT(" MOVETO (%i,%i,%i,%i,%i,%i) ==== "), _playerPosition.getU(), _playerPosition.getV(), _playerPosition.getW(), _playerPosition.getZ(), _playerPosition.getY(), _playerPosition.getX());
 }
 
 /**
@@ -240,7 +234,6 @@ void UTouchBlueprintFunctionLibrary::clickWPlus() {
  */
 void UTouchBlueprintFunctionLibrary::clickWMinus() {
     _playerPosition = _mazeBuild->MoveDimension(_playerPosition, W_MINUS);
-    _debugText += FString::Printf(TEXT(" MOVETO (%i,%i,%i,%i,%i,%i) ==== "), _playerPosition.getU(), _playerPosition.getV(), _playerPosition.getW(), _playerPosition.getZ(), _playerPosition.getY(), _playerPosition.getX());
 }
 
 /**
@@ -490,27 +483,6 @@ float UTouchBlueprintFunctionLibrary::getPlayerRotationRoll() {
 void UTouchBlueprintFunctionLibrary::initMaze() {
     _mazeBuild->NewMaze(_u_size, _v_size, _w_size, _depth, _height, _width);
     Maze maze = _mazeBuild->GetMaze();
-    _debugText = FString();
-    for (int uLoop = 0; uLoop < _u_size; uLoop++) {
-   		for (int vLoop = 0; vLoop < _v_size; vLoop++) {
-   			for (int wLoop = 0; wLoop < _w_size; wLoop++) {
-                for (int zLoop = 0; zLoop <= _depth; zLoop++) {
-                    for (int yLoop = 0; yLoop <= _height; yLoop++) {
-                        for (int xLoop = 0; xLoop <= _width; xLoop++) {
-                            Position pos = Position(uLoop, vLoop, wLoop, zLoop, yLoop, xLoop);
-                            for (int dirLoop = 0; dirLoop < DIRECTION_COUNT; dirLoop++) {
-                                Direction dir = static_cast<Direction>(dirLoop);
-                                if (maze.getPassage(pos, dir)) {
-                                    _debugText += FString::Printf(TEXT("passage Position(%i,%i,%i,%i,%i,%i) direction %s ==== "), uLoop, vLoop, wLoop, zLoop, yLoop, xLoop, DIRECTION_TEXT[dirLoop]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    _debugText += FString::Printf(TEXT("\n=======================================\n"));
     _mazeBuild->startMaze();
     _win_showing = false;
     _win_shown = false;
@@ -531,8 +503,8 @@ void UTouchBlueprintFunctionLibrary::newMap(AMazeBuild* mazeBuild, APlayerContro
     _mazeBuild = mazeBuild;
     APawn* pawn = playerController->GetPawn();
     ACharacter* player = static_cast<ACharacter*>(pawn);
-    _skyLightComponent = skyLight->GetLightComponent();
     setPlayer(player);
+    _skyLightComponent = skyLight->GetLightComponent();
     initMaze();
 }
 
@@ -595,7 +567,6 @@ void UTouchBlueprintFunctionLibrary::rotatePlayer(FRotator rotator) {
  */
 void UTouchBlueprintFunctionLibrary::turnPlayerUp(bool isPress) {
     if (isPress && _playerForward != UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[UP_]) {
-        _debugText += FString::Printf(TEXT(" UP ==== "));
         rotatePlayer(FRotator(+90, 0, 0));
     }
 }
@@ -607,7 +578,6 @@ void UTouchBlueprintFunctionLibrary::turnPlayerUp(bool isPress) {
  */
 void UTouchBlueprintFunctionLibrary::turnPlayerDown(bool isPress) {
     if (isPress && _playerForward != UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_]) {
-        _debugText += FString::Printf(TEXT(" DOWN ==== "));
         rotatePlayer(FRotator(-90, 0, 0));
     }
 }
@@ -619,7 +589,6 @@ void UTouchBlueprintFunctionLibrary::turnPlayerDown(bool isPress) {
  */
 void UTouchBlueprintFunctionLibrary::turnPlayerLeft(bool isPress) {
     if (isPress) {
-        _debugText += FString::Printf(TEXT(" LEFT ==== "));
         rotatePlayer(FRotator(0, -90, 0));
    }
 }
@@ -631,7 +600,6 @@ void UTouchBlueprintFunctionLibrary::turnPlayerLeft(bool isPress) {
  */
 void UTouchBlueprintFunctionLibrary::turnPlayerRight(bool isPress) {
     if (isPress) {
-        _debugText += FString::Printf(TEXT(" RIGHT ==== "));
         rotatePlayer(FRotator(0, +90, 0));
     }
 }
@@ -643,7 +611,6 @@ void UTouchBlueprintFunctionLibrary::turnPlayerRight(bool isPress) {
  */
 void UTouchBlueprintFunctionLibrary::turnPlayerReverse(bool isPress) {
     if (isPress) {
-        _debugText += FString::Printf(TEXT(" REVERSE ==== "));
         if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[UP_]) {
             rotatePlayer(FRotator(-180, 0, 0));
         } else if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_]) {
@@ -737,15 +704,6 @@ void UTouchBlueprintFunctionLibrary::changeWall() {
 }
 
 /**
- * get the tet to sidplay in the users debug screen
- *
- * @return {FString}
- */
-FString UTouchBlueprintFunctionLibrary::getDebugText() {
-    return _debugText;
-}
-
-/**
  * start or stop moving a player forward if the key is pressed or not
  *
  * @param {bool} isPress
@@ -766,19 +724,19 @@ void UTouchBlueprintFunctionLibrary::ShowWin() {
     _mazeBuild->playWin();
 }
 
+bool UTouchBlueprintFunctionLibrary::isWin() {
+    return _win_shown;
+}
+
 // Called every frame
 void UTouchBlueprintFunctionLibrary::Tick(float DeltaTime)
 {
     if (_playerMoving) {
-        Position savePlayerPosition = _playerPosition;
         _player->AddMovementInput(_playerForward, _playerSpeed, true);
-        _playerPosition = _mazeBuild->locationToPosition(_playerPosition.getU(), _playerPosition.getV(), _playerPosition.getW(), _player->GetActorLocation());
-        if (!(_playerPosition == savePlayerPosition)) {
-            _debugText += FString::Printf(TEXT(" MOVETO (%i,%i,%i,%i,%i,%i) ==== "), _playerPosition.getU(), _playerPosition.getV(), _playerPosition.getW(), _playerPosition.getZ(), _playerPosition.getY(), _playerPosition.getX());
-        }
-        if (_playerPosition == _mazeBuild->GetMaze().getEnd() && !_win_shown) {
-            ShowWin();
-        }
+    }
+    _playerPosition = _mazeBuild->locationToPosition(_playerPosition.getU(), _playerPosition.getV(), _playerPosition.getW(), _player->GetActorLocation());
+    if (_playerPosition == _mazeBuild->GetMaze().getEnd() && !_win_shown) {
+        ShowWin();
     }
     if (_win_showing) {
         _win_showing_time += DeltaTime;
