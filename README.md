@@ -1,5 +1,5 @@
 # MultiDimensionalMaze
-This is a (up to) six dimensional maze. There are three visual dimensions -
+This is a (up to) six dimensional maze. There are three visual dimensions -<br/>
      x (cyan), y (magenta), z (yellow), and three unseen dimensions -
      u (red), v (green), w (blue).
 To move forward, press and hold the mouse button. Then release the mouse button to stop.
