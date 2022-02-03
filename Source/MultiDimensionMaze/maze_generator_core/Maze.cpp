@@ -143,7 +143,7 @@ bool Maze::isPosInMaze(Position pos) {
  */
 
 bool Maze::getPassage(Position pos, Direction dir) {
-    if (pos.getU() < 0 || pos.getU() >= getUSize() || pos.getV() < 0 || pos.getV() >= getVSize() || pos.getW() < 0 || pos.getW() >= getWSize() || pos.getZ() < 0 || pos.getZ() >= getDepth() || pos.getY() < 0 || pos.getY() >= getHeight() || pos.getX() < 0 || pos.getX() >= getWidth()) {
+    if (!isPosInMaze(pos)) {
         return false;
     }
     return cell_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()][pos.getX()].is_open(dir);
@@ -159,24 +159,15 @@ bool Maze::getPassage(Position pos, Direction dir) {
  * @param {bool} value
  */
 void Maze::setPassage(Position pos, Direction dir, bool value) {
-    if (pos.getU() < 0 || pos.getU() >= getUSize() || pos.getV() < 0 || pos.getV() >= getVSize() || pos.getW() < 0 || pos.getW() >= getWSize() || pos.getZ() < 0 || pos.getZ() >= getDepth() || pos.getY() < 0 || pos.getY() >= getHeight() || pos.getX() < 0 || pos.getX() >= getWidth()) {
+    if (!isPosInMaze(pos)) {
         return;
     }
     cell_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()][pos.getX()].set_open(dir, value);
-    if (pos.getU() + dirs::du(dir) < 0 || pos.getU() + dirs::du(dir) >= getUSize() || pos.getV() + dirs::dv(dir) < 0 || pos.getV() + dirs::dv(dir) >= getVSize() || pos.getW() + dirs::dw(dir) < 0 || pos.getW() + dirs::dw(dir) >= getWSize() || pos.getZ() + dirs::dz(dir) < 0 || pos.getZ() + dirs::dz(dir) >= getDepth() || pos.getY() + dirs::dy(dir) < 0 || pos.getY() + dirs::dy(dir) >= getHeight() || pos.getX() + dirs::dx(dir) < 0 || pos.getX() + dirs::dx(dir) >= getWidth()) {
+    if (!isPosInMaze(pos.neighbor(dir))) {
         return;
     }
     cell_grid[pos.getU() + dirs::du(dir)][pos.getV() + dirs::dv(dir)][pos.getW() + dirs::dw(dir)][pos.getZ() + dirs::dz(dir)][pos.getY() + dirs::dy(dir)][pos.getX() + dirs::dx(dir)].set_open(dirs::opposite(dir), value);
 };
-
-/**
- * Gets the start position of the maze
- *
- * @return {Position}
- */
-Position Maze::getStart() {
-    return Position(0, 0, 0, 0, 0, 0);
-}
 
 /**
  * Gets the end position of the maze
@@ -194,7 +185,7 @@ Position Maze::getEnd() {
  * @return {Cell*}
  */
 Cell* Maze::getCellAt(Position pos) {
-    if (pos.getU() < 0 || pos.getU() >= getUSize() || pos.getV() < 0 || pos.getV() >= getVSize() || pos.getW() < 0 || pos.getW() >= getWSize() || pos.getZ() < 0 || pos.getZ() >= getDepth() || pos.getY() < 0 || pos.getY() >= getHeight() || pos.getX() < 0 || pos.getX() >= getWidth()) {
+    if (!isPosInMaze(pos)) {
         return NULL;
     }
     return &cell_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()][pos.getX()];
