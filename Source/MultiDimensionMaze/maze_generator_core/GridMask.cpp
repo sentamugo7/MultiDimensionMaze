@@ -124,7 +124,7 @@ void GridMask::set(Position pos, bool value) {
     if (pos.getU() < 0 || pos.getU() >= _u_size || pos.getV() < 0 || pos.getV() >= _v_size || pos.getW() < 0 || pos.getW() >= _w_size || pos.getZ() < 0 || pos.getZ() >= _depth || pos.getY() < 0 || pos.getY() >= _height || pos.getX() < 0 || pos.getX() >= _width) {
         return;
     }
-    if (pos.getU() >= bool_grid.size() || pos.getV() >= bool_grid[pos.getU()].size() || pos.getW() >= bool_grid[pos.getU()][pos.getV()].size() || pos.getZ() >= bool_grid[pos.getU()][pos.getV()][pos.getW()].size() || pos.getY() >= bool_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()].size() || pos.getY() >= bool_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()].size()) {
+    if (pos.getU() >= bool_grid.size() || pos.getV() >= bool_grid[pos.getU()].size() || pos.getW() >= bool_grid[pos.getU()][pos.getV()].size() || pos.getZ() >= bool_grid[pos.getU()][pos.getV()][pos.getW()].size() || pos.getY() >= bool_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()].size() || pos.getX() >= bool_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()].size()) {
         return;
     }
 
