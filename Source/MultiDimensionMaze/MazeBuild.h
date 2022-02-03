@@ -84,7 +84,6 @@ public:
 	Position locationToPosition(int u, int v, int w, FVector location);
 	FVector positionToLocation(Position pos);
 	Maze GetMaze();
-	void scaleEndTermination(float scale);
 	void changeWall();
 	void playWin();
 
@@ -96,6 +95,7 @@ private:
 	UInstancedStaticMeshComponent* DimensionLetter(Position pos, Direction dir);
 	void DimensionText(Position pos);
 	void ProcessCell(Position pos);
+	void clearBuild();
 	void DisplayMaze();
 	void SetDimension(Position pos);
 	FVector positionToLocation(Position pos, FVector delta);
