@@ -14,8 +14,8 @@ To get a hint, click on the ![Image](Icon-pictures.png "icon") icon, the hint wi
 The dimensions icon in the upper right ![Image](Icon-pictures.png "icon") will show the colored orientation.  
 To change the size of the maze, click on the ![Image](Icon-pictures.png "icon") icon in the upper right. Here,  
      you can update the size of each dimension.  
-Then click the **Apply** button to regenerate a maze with the new size, or click  
-     the **Cancel** button to cancel.  
+Then click the **`Apply`** button to regenerate a maze with the new size, or click  
+     the **`Cancel`** button to cancel.  
 To "collapse" a dimension, to remove it, set that dimension size to 1.  
 You will start out at the begin cell (1 in each dimension), with a gray ball, and your goal is to reach  
      the end cell (max of each dimension), with a white ball.  
