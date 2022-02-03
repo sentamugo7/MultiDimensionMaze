@@ -3,7 +3,7 @@ This is a (up to) six dimensional maze. There are three visual dimensions -
 x (cyan), y (magenta), z (yellow), and three unseen dimensions -  
 u (red), v (green), w (blue).  
 To move forward, press and hold the mouse button. Then release the mouse button to stop.  
-To turn left ![Image](icons/left_no.svg "icon"), right ![Image](Icon-pictures.png "icon"), up ![Image](Icon-pictures.png "icon"), down ![Image](Icon-pictures.png "icon"), or reverse ![Image](Icon-pictures.png "icon"), click on that icon in  
+To turn left <img src="icons/left_no.svg" width="80" height="80">, right ![Image](Icon-pictures.png "icon"), up ![Image](Icon-pictures.png "icon"), down ![Image](Icon-pictures.png "icon"), or reverse ![Image](Icon-pictures.png "icon"), click on that icon in  
 the upper right. The icon will be white if there is a path in that direction,  
 otherwise black.  
 If there is a pathway in an unseen dimension, there will be a plus and/or  
