@@ -135,9 +135,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static void changeWall();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static FString getDebugText();
-	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static void newMap(AMazeBuild* mazeBuild, APlayerController* playerController, ASkyLight* skyLight);
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+		static bool isWin();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static void Tick(float DeltaTime);
 
@@ -152,12 +152,12 @@ public:
 
 private:
 	static void initMaze();
-	const static int DEFAULT_DIMENSION_SIZE = 3;
+	const static int DEFAULT_DIMENSION_SIZE = 5;
 	constexpr static float DEFAULT_PLAYER_SPEED = 0.2;
 	constexpr static float DEFAULT_CELL_SIZE = 1.0;
 	constexpr static float WIN_DISPLAY_TIME = 5.0;
 	static Position START;
-	static FRotator INIT_PLAYER_ROTATION ;
+	static FRotator INIT_PLAYER_ROTATION;
 	static FVector INIT_PLAYER_FORWARD;
 	static FString MAIN_LEVEL_NAME;
 
@@ -168,7 +168,6 @@ private:
 	static FVector _playerForward;
 	static AController* _playerController;
 	static Position _playerPosition;
-	static FString _debugText;
 
 	static int _u_size;
 	static int _v_size;
