@@ -12,7 +12,9 @@ magick convert -background none -colorspace sRGB -define png:color-type=6 revers
 magick convert -background none -colorspace sRGB -define png:color-type=6 reverse_no.svg reverse_no.png
 
 magick convert -background none -colorspace sRGB -define png:color-type=6 dimensions.svg dimensions.png
+magick convert -background none -colorspace sRGB -define png:color-type=6 dimensions_neg.svg dimensions_neg.png
 magick convert -background none -colorspace sRGB -define png:color-type=6 settings.svg settings.png
+magick convert -background none -colorspace sRGB -define png:color-type=6 settings_neg.svg settings_neg.png
 magick convert -background none -colorspace sRGB -define png:color-type=6 MultiDimensionalMaze.svg MultiDimensionalMaze.png
 
 magick convert -background none -colorspace sRGB -define png:color-type=6 hint_u_plus.svg hint_u_plus.png
@@ -26,9 +28,11 @@ magick convert -background none -colorspace sRGB -define png:color-type=6 hint_d
 magick convert -background none -colorspace sRGB -define png:color-type=6 hint_left.svg hint_left.png
 magick convert -background none -colorspace sRGB -define png:color-type=6 hint_right.svg hint_right.png
 magick convert -background none -colorspace sRGB -define png:color-type=6 hint_forward.svg hint_forward.png
+magick convert -background none -colorspace sRGB -define png:color-type=6 hint_forward_neg.svg hint_forward_neg.png
 magick convert -background none -colorspace sRGB -define png:color-type=6 hint_reverse.svg hint_reverse.png
-magick convert -background none -colorspace sRGB -define png:color-type=6 hint_blank.svg hint_blank.png
 magick convert -background none -colorspace sRGB -define png:color-type=6 hint_win.svg hint_win.png
+magick convert -background none -colorspace sRGB -define png:color-type=6 hint_blank.svg hint_blank.png
+magick convert -background none -colorspace sRGB -define png:color-type=6 hint_blank_neg.svg hint_blank_neg.png
 
 magick convert -background none -colorspace sRGB -define png:color-type=6 orientation_south.svg orientation_south.png
 magick convert -background none -colorspace sRGB -define png:color-type=6 orientation_east.svg orientation_east.png
