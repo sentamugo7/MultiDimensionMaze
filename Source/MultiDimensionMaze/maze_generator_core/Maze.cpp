@@ -96,15 +96,6 @@ int Maze::getWidth() {
 }
 
 /**
- * The maximum of all dimensions of the Maze
- *
- * @return {integer}
- */
-int Maze::getMaxDimension() {
-    return std::max(getUSize(), std::max(getVSize(), std::max(getWSize(), std::max(getDepth(), std::max(getHeight(), getWidth())))));
-}
-
-/**
  * The number of (non collapsed) dimensions of the Maze
  *
  * @return {integer}
@@ -233,8 +224,19 @@ void Maze::solveAt(Position pos) {
 void Maze::solve() {
     getCellAt(getEnd())->setSolution(Direction::END);
     solveAt(getEnd());
+}
+
+int Maze::solutionCount() {
+    int count = 0;
     Position posLoop = START;
     while (!(posLoop == getEnd())) {
+        count++;
         posLoop = posLoop.neighbor(getCellAt(posLoop)->getSolution());
     }
+    return count;
 }
+
+int Maze::basisCount() {
+    return _u_size + _v_size + _w_size + _depth + _height + _width;
+}
+

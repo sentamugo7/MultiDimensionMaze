@@ -8,7 +8,7 @@
 BacktrackGenerator::BacktrackGenerator()
 {
     //////////    set for consistent testing
-    /////    srand(1);
+    //////////srand(1);
     /////    for (int i = 0; i < 5; i++) rand();
 }
 

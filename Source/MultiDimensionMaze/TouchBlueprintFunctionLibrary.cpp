@@ -22,11 +22,19 @@ int UTouchBlueprintFunctionLibrary::_w_size = 1;// DEFAULT_DIMENSION_SIZE;
 int UTouchBlueprintFunctionLibrary::_depth = 1;
 int UTouchBlueprintFunctionLibrary::_height = DEFAULT_DIMENSION_SIZE;
 int UTouchBlueprintFunctionLibrary::_width = DEFAULT_DIMENSION_SIZE;
+int UTouchBlueprintFunctionLibrary::_save_u_size;
+int UTouchBlueprintFunctionLibrary::_save_v_size;
+int UTouchBlueprintFunctionLibrary::_save_w_size;
+int UTouchBlueprintFunctionLibrary::_save_depth;
+int UTouchBlueprintFunctionLibrary::_save_height;
+int UTouchBlueprintFunctionLibrary::_save_width;
 float UTouchBlueprintFunctionLibrary::_playerSpeed = DEFAULT_PLAYER_SPEED;
 float UTouchBlueprintFunctionLibrary::_cellSize = DEFAULT_CELL_SIZE;
-bool UTouchBlueprintFunctionLibrary::_win_showing = false;
-float UTouchBlueprintFunctionLibrary::_win_showing_time = 0.0;
+bool UTouchBlueprintFunctionLibrary::_is_tutorial = false;
+bool UTouchBlueprintFunctionLibrary::_is_demo = false;
 bool UTouchBlueprintFunctionLibrary::_win_shown = false;
+int UTouchBlueprintFunctionLibrary::RAND_SEEDS[RAND_SEED_COUNT];
+int UTouchBlueprintFunctionLibrary::randSeedIndex = 0;
 
 FVector UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[12] = { FVector(0,0,0), FVector(0,0,0), FVector(0,0,0), FVector(0,0,0), FVector(0,0,0), FVector(0,0,0), FVector(0,0,1), FVector(0,0,-1), FVector(0,1,0), FVector(0,-1,0), FVector(-1,0,0), FVector(1,0,0) };
 
@@ -36,12 +44,100 @@ static const FString DIRECTION_HINT[] =
 // UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::movePlayer isPress = %i"), isPress);
 
 /**
- * user presses/unpresses screen to go forward
+ * indicates whether the player is moving
  *
- * @param {bool} isPress
+ * @return {bool}
  */
-void UTouchBlueprintFunctionLibrary::touchScreen(bool isPress) {
-    movePlayer(isPress);
+bool UTouchBlueprintFunctionLibrary::isPlayerMoving() {
+    return _playerMoving;
+}
+
+/**
+ * if the current Cell that the player is in has passage in the up direction
+ *
+ * @param {bool}
+ */
+bool UTouchBlueprintFunctionLibrary::hasUp() {
+    return !isUp() &&
+        (
+            ((_playerForward == PLAYER_FORWARD[SOUTH] || _playerForward == PLAYER_FORWARD[NORTH] || _playerForward == PLAYER_FORWARD[EAST] || _playerForward == PLAYER_FORWARD[WEST]) && _mazeBuild->GetMaze().getPassage(_playerPosition, UP_)) ||
+            (_playerForward == PLAYER_FORWARD[DOWN_] && ((_playerRotator.Roll == 180 && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST)) || (_playerRotator.Roll == 90 && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH)) || (_playerRotator.Roll == 0 && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST)) || (_playerRotator.Roll == 270 && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH))))
+            )
+        ;
+}
+
+/**
+ * if the current Cell that the player is in has passage in the down direction
+ *
+ * @param {bool}
+ */
+bool UTouchBlueprintFunctionLibrary::hasDown() {
+    return !isDown() &&
+        (
+            ((_playerForward == PLAYER_FORWARD[SOUTH] || _playerForward == PLAYER_FORWARD[NORTH] || _playerForward == PLAYER_FORWARD[EAST] || _playerForward == PLAYER_FORWARD[WEST]) && _mazeBuild->GetMaze().getPassage(_playerPosition, DOWN_)) ||
+            (_playerForward == PLAYER_FORWARD[UP_] && ((_playerRotator.Roll == 180 && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST)) || (_playerRotator.Roll == 90 && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH)) || (_playerRotator.Roll == 0 && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST)) || (_playerRotator.Roll == 270 && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH))))
+            )
+        ;
+}
+
+/**
+ * if the current Cell that the player is in has passage in the left direction
+ *
+ * @param {bool}
+ */
+bool UTouchBlueprintFunctionLibrary::hasLeft() {
+    return
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[SOUTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[NORTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[EAST] && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[WEST] && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH))
+        ;
+}
+
+/**
+ * if the current Cell that the player is in has passage in the right direction
+ *
+ * @param {bool}
+ */
+bool UTouchBlueprintFunctionLibrary::hasRight() {
+    return
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[SOUTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[NORTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[EAST] && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[WEST] && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH))
+        ;
+}
+
+/**
+ * if the current Cell that the player is in has passage in the forward direction
+ *
+ * @param {bool}
+ */
+bool UTouchBlueprintFunctionLibrary::hasForward() {
+    return
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[UP_] && _mazeBuild->GetMaze().getPassage(_playerPosition, UP_)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_] && _mazeBuild->GetMaze().getPassage(_playerPosition, DOWN_)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[SOUTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[NORTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[EAST] && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[WEST] && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST))
+        ;
+}
+
+/**
+ * if the current Cell that the player is in has passage in the reverse direction
+ *
+ * @param {bool}
+ */
+bool UTouchBlueprintFunctionLibrary::hasReverse() {
+    return
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[UP_] && _mazeBuild->GetMaze().getPassage(_playerPosition, DOWN_)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_] && _mazeBuild->GetMaze().getPassage(_playerPosition, UP_)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[SOUTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[NORTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[EAST] && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST)) ||
+        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[WEST] && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST))
+        ;
 }
 
 /**
@@ -99,78 +195,6 @@ bool UTouchBlueprintFunctionLibrary::hasWMinus() {
 }
 
 /**
- * if the current Cell that the player is in has passage in the up direction
- *
- * @param {bool}
- */
-bool UTouchBlueprintFunctionLibrary::hasUp() {
-    return !isUp() &&
-        (
-            ((_playerForward == PLAYER_FORWARD[SOUTH] || _playerForward == PLAYER_FORWARD[NORTH] || _playerForward == PLAYER_FORWARD[EAST] || _playerForward == PLAYER_FORWARD[WEST]) && _mazeBuild->GetMaze().getPassage(_playerPosition, UP_)) ||
-            (_playerForward == PLAYER_FORWARD[DOWN_] && ((_playerRotator.Roll == 180 && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST)) || (_playerRotator.Roll == 90 && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH)) || (_playerRotator.Roll == 0 && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST)) || (_playerRotator.Roll == 270 && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH))))
-        )
-    ;
-}
-
-/**
- * if the current Cell that the player is in has passage in the down direction
- *
- * @param {bool}
- */
-bool UTouchBlueprintFunctionLibrary::hasDown() {
-    return !isDown() &&
-        (
-            ((_playerForward == PLAYER_FORWARD[SOUTH] || _playerForward == PLAYER_FORWARD[NORTH] || _playerForward == PLAYER_FORWARD[EAST] || _playerForward == PLAYER_FORWARD[WEST]) && _mazeBuild->GetMaze().getPassage(_playerPosition, DOWN_)) ||
-            (_playerForward == PLAYER_FORWARD[UP_] && ((_playerRotator.Roll == 180 && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST)) || (_playerRotator.Roll == 90 && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH)) || (_playerRotator.Roll == 0 && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST)) || (_playerRotator.Roll == 270 && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH))))
-            )
-        ;
-}
-
-/**
- * if the current Cell that the player is in has passage in the left direction
- *
- * @param {bool}
- */
-bool UTouchBlueprintFunctionLibrary::hasLeft() {
-    return
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[SOUTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[NORTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[EAST] && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[WEST] && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH))
-        ;
-}
-
-/**
- * if the current Cell that the player is in has passage in the right direction
- *
- * @param {bool}
- */
-bool UTouchBlueprintFunctionLibrary::hasRight() {
-    return
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[SOUTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[NORTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[EAST] && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[WEST] && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH))
-        ;
-}
-
-/**
- * if the current Cell that the player is in has passage in the reverse direction
- *
- * @param {bool}
- */
-bool UTouchBlueprintFunctionLibrary::hasReverse() {
-    return
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[UP_] && _mazeBuild->GetMaze().getPassage(_playerPosition, DOWN_)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_] && _mazeBuild->GetMaze().getPassage(_playerPosition, UP_)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[SOUTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, NORTH)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[NORTH] && _mazeBuild->GetMaze().getPassage(_playerPosition, SOUTH)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[EAST] && _mazeBuild->GetMaze().getPassage(_playerPosition, WEST)) ||
-        (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[WEST] && _mazeBuild->GetMaze().getPassage(_playerPosition, EAST))
-    ;
-}
-
-/**
  * if the player is going in the up direction
  *
  * @param {bool}
@@ -186,6 +210,80 @@ bool UTouchBlueprintFunctionLibrary::isUp() {
  */
 bool UTouchBlueprintFunctionLibrary::isDown() {
     return _playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_];
+}
+
+/**
+ * user presses/unpresses up button
+ *
+ * @param {bool} isPress
+ */
+void UTouchBlueprintFunctionLibrary::turnPlayerUp(bool isPress) {
+    if (isPress && _playerForward != UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[UP_]) {
+        rotatePlayer(FRotator(+90, 0, 0));
+    }
+}
+
+/**
+ * user presses/unpresses down button
+ *
+ * @param {bool} isPress
+ */
+void UTouchBlueprintFunctionLibrary::turnPlayerDown(bool isPress) {
+    if (isPress && _playerForward != UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_]) {
+        rotatePlayer(FRotator(-90, 0, 0));
+    }
+}
+
+/**
+ * user presses/unpresses left button
+ *
+ * @param {bool} isPress
+ */
+void UTouchBlueprintFunctionLibrary::turnPlayerLeft(bool isPress) {
+    if (isPress) {
+        rotatePlayer(FRotator(0, -90, 0));
+    }
+}
+
+/**
+ * user presses/unpresses right button
+ *
+ * @param {bool} isPress
+ */
+void UTouchBlueprintFunctionLibrary::turnPlayerRight(bool isPress) {
+    if (isPress) {
+        rotatePlayer(FRotator(0, +90, 0));
+    }
+}
+
+/**
+ * user presses/unpresses forward button
+ *
+ * @param {bool} isPress
+ */
+void UTouchBlueprintFunctionLibrary::goPlayerForward(bool isPress) {
+    if (isPress && hasForward()) {
+        MovePlayerTo(_playerPosition.neighbor(getPlayerForwardDirection()));
+    }
+}
+
+/**
+ * user presses/unpresses reverse button
+ *
+ * @param {bool} isPress
+ */
+void UTouchBlueprintFunctionLibrary::turnPlayerReverse(bool isPress) {
+    if (isPress) {
+        if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[UP_]) {
+            rotatePlayer(FRotator(-180, 0, 0));
+        }
+        else if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_]) {
+            rotatePlayer(FRotator(+180, 0, 0));
+        }
+        else {
+            rotatePlayer(FRotator(0, +180, 0));
+        }
+    }
 }
 
 /**
@@ -357,6 +455,7 @@ FString UTouchBlueprintFunctionLibrary::getOrientation() {
         case 270:
             return FString("orientation_down_north");
         default:
+            UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::getOrientation _playerForward == PLAYER_FORWARD[Direction::DOWN_], viewYaw = %i"), viewYaw); /////
             return FString("dimensions");
         }
     }
@@ -371,9 +470,11 @@ FString UTouchBlueprintFunctionLibrary::getOrientation() {
         case 270:
             return FString("orientation_up_north");
         default:
+            UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::getOrientation _playerForward == PLAYER_FORWARD[Direction::UP_], viewYaw = %i"), viewYaw); /////
             return FString("dimensions");
         }
     }
+    UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::getOrientation _playerForward == [%f,%f,%f], viewYaw = %i"), _playerForward.X, _playerForward.Y, _playerForward.Z, viewYaw); /////
     return FString("dimensions");
 }
 
@@ -481,10 +582,14 @@ float UTouchBlueprintFunctionLibrary::getPlayerRotationRoll() {
  *
  */
 void UTouchBlueprintFunctionLibrary::initMaze() {
+    randSeedIndex = (randSeedIndex + 1) % RAND_SEED_COUNT;
+    unsigned int randSeed = RAND_SEEDS[randSeedIndex];
+ //   UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::initMaze randSeed = %i"), randSeed);
+    srand(randSeed);
+    _mazeBuild->displayRandSeed(randSeed);
     _mazeBuild->NewMaze(_u_size, _v_size, _w_size, _depth, _height, _width);
     Maze maze = _mazeBuild->GetMaze();
     _mazeBuild->startMaze();
-    _win_showing = false;
     _win_shown = false;
     _playerRotator = INIT_PLAYER_ROTATION;
     _playerForward = INIT_PLAYER_FORWARD;
@@ -500,6 +605,9 @@ void UTouchBlueprintFunctionLibrary::initMaze() {
  * @param {ASkyLight*} skyLight
  */
 void UTouchBlueprintFunctionLibrary::newMap(AMazeBuild* mazeBuild, APlayerController* playerController, ASkyLight* skyLight) {
+    for (int loop = 0; loop < RAND_SEED_COUNT; loop++) {
+        RAND_SEEDS[loop] = (abs(rand())) % MAX_RAND_SEED;
+    }
     _mazeBuild = mazeBuild;
     APawn* pawn = playerController->GetPawn();
     ACharacter* player = static_cast<ACharacter*>(pawn);
@@ -561,67 +669,6 @@ void UTouchBlueprintFunctionLibrary::rotatePlayer(FRotator rotator) {
 }
 
 /**
- * user presses/unpresses up button
- *
- * @param {bool} isPress
- */
-void UTouchBlueprintFunctionLibrary::turnPlayerUp(bool isPress) {
-    if (isPress && _playerForward != UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[UP_]) {
-        rotatePlayer(FRotator(+90, 0, 0));
-    }
-}
-
-/**
- * user presses/unpresses down button
- *
- * @param {bool} isPress
- */
-void UTouchBlueprintFunctionLibrary::turnPlayerDown(bool isPress) {
-    if (isPress && _playerForward != UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_]) {
-        rotatePlayer(FRotator(-90, 0, 0));
-    }
-}
-
-/**
- * user presses/unpresses left button
- *
- * @param {bool} isPress
- */
-void UTouchBlueprintFunctionLibrary::turnPlayerLeft(bool isPress) {
-    if (isPress) {
-        rotatePlayer(FRotator(0, -90, 0));
-   }
-}
-
-/**
- * user presses/unpresses right button
- *
- * @param {bool} isPress
- */
-void UTouchBlueprintFunctionLibrary::turnPlayerRight(bool isPress) {
-    if (isPress) {
-        rotatePlayer(FRotator(0, +90, 0));
-    }
-}
-
-/**
- * user presses/unpresses reverse button
- *
- * @param {bool} isPress
- */
-void UTouchBlueprintFunctionLibrary::turnPlayerReverse(bool isPress) {
-    if (isPress) {
-        if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[UP_]) {
-            rotatePlayer(FRotator(-180, 0, 0));
-        } else if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_]) {
-            rotatePlayer(FRotator(+180, 0, 0));
-        } else {
-            rotatePlayer(FRotator(0, +180, 0));
-        }
-    }
-}
-
-/**
  * maze size u dimension
  *
  * @return {int}
@@ -675,6 +722,25 @@ int UTouchBlueprintFunctionLibrary::getZSize() {
     return _depth;
 }
 
+int UTouchBlueprintFunctionLibrary::getDimensionSize(int dimensionIndex) {
+    switch (dimensionIndex) { 
+    case 0:
+        return _u_size;
+    case 1:
+        return _v_size;
+    case 2:
+        return _w_size;
+    case 3:
+        return _width;
+    case 4:
+        return _height;
+    case 5:
+        return _depth;
+    default:
+        return -1;
+    }
+}
+
 /**
  * update user settings, dimension size in each dimension
  *
@@ -713,17 +779,58 @@ void UTouchBlueprintFunctionLibrary::movePlayer(bool isPress) {
 }
 
 /**
+ * after win displayed, create new maze
+ *
+ */
+void UTouchBlueprintFunctionLibrary::FinishWin() {
+    _mazeBuild->endShowWin();
+}
+
+/**
  * Display that the player has won, reached the end Call.
  *
  */
 void UTouchBlueprintFunctionLibrary::ShowWin() {
     _playerMoving = false;
-    _win_showing = true;
-    _win_showing_time = 0.0;
-    _win_shown = true;
     _mazeBuild->playWin();
+    FTimerHandle TimerHandle;
+    _mazeBuild->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
+        {
+           FinishWin();
+        }, WIN_DISPLAY_TIME, false);
 }
 
+
+Direction UTouchBlueprintFunctionLibrary::getPlayerForwardDirection() {
+    if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[UP_]) {
+        return Direction::UP_;
+    }
+    else if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[DOWN_]) {
+        return Direction::DOWN_;
+    }
+    else if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[SOUTH]) {
+        return Direction::SOUTH;
+    }
+    else if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[NORTH]) {
+        return Direction::NORTH;
+    }
+    else if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[EAST]) {
+        return Direction::EAST;
+    }
+    else if (_playerForward == UTouchBlueprintFunctionLibrary::PLAYER_FORWARD[WEST]) {
+        return Direction::WEST;
+    }
+    UE_LOG(LogTemp, Log, TEXT(">>>>>>>> UTouchBlueprintFunctionLibrary::getPlayerForwardDirection FAIL _playerForward == [%f,%f,%f] !!!!!"), _playerForward.X, _playerForward.Y, _playerForward.Z);
+    return Direction::NONE;
+}
+
+
+
+/**
+ * indicate if the player has won
+ *
+ * @return bool
+ */
 bool UTouchBlueprintFunctionLibrary::isWin() {
     return _win_shown;
 }
@@ -736,27 +843,87 @@ void UTouchBlueprintFunctionLibrary::Tick(float DeltaTime)
     }
     _playerPosition = _mazeBuild->locationToPosition(_playerPosition.getU(), _playerPosition.getV(), _playerPosition.getW(), _player->GetActorLocation());
     if (_playerPosition == _mazeBuild->GetMaze().getEnd() && !_win_shown) {
+        _win_shown = true;
         ShowWin();
-    }
-    if (_win_showing) {
-        _win_showing_time += DeltaTime;
-        if (_win_showing_time > WIN_DISPLAY_TIME) {
-            _win_showing = false;
-            _mazeBuild->setWin();
-            _skyLightComponent->SetLightColor(FLinearColor(1.0, 1.0, 1.0, 1.0));
-        }
-        else {
-            int win_show_percent = (int)(100.0 * _win_showing_time / WIN_DISPLAY_TIME);
-            int display_percent = 6 * win_show_percent;
-            float InR = (display_percent % 100) / 100.0;
-            float InG = ((display_percent + 33) % 100) / 100.0;
-            float InB = ((display_percent + 67) % 100) / 100.0;
-            float InA = 1.0;
-            _skyLightComponent->SetLightColor(FLinearColor(InR, InG, InB, InA));
-        }
     }
 }
 
+/**
+ * Setter for tutorial state
+ *
+ * @param {bool} tutorial
+ */
+void UTouchBlueprintFunctionLibrary::setTutorial(bool tutorial) {
+    _is_tutorial  = tutorial;
+    if (_is_tutorial) {
+        _save_u_size = _u_size;
+        _save_v_size = _v_size;
+        _save_w_size = _w_size;
+        _save_depth = _depth;
+        _save_height = _height;
+        _save_width = _width;
+    }
+}
+
+/**
+ * Getter for tutorial state
+ *
+ * @return bool
+ */
+bool UTouchBlueprintFunctionLibrary::isTutorial() {
+    return _is_tutorial;
+}
+
+/**
+ * Setter for demo state
+ *
+ * @param {bool} demo
+ */
+void UTouchBlueprintFunctionLibrary::setDemo(bool demo) {
+    _is_demo = demo;
+    if (_is_demo) {
+        _save_u_size = _u_size;
+        _save_v_size = _v_size;
+        _save_w_size = _w_size;
+        _save_depth = _depth;
+        _save_height = _height;
+        _save_width = _width;
+        updateSettings(DEMO_U_DIMENSION, DEMO_V_DIMENSION, DEMO_W_DIMENSION, DEMO_X_DIMENSION, DEMO_Y_DIMENSION, DEMO_Z_DIMENSION);
+    }
+}
+
+/**
+ * Getter for demo state
+ *
+ * @return bool
+ */
+bool UTouchBlueprintFunctionLibrary::isDemo() {
+    return _is_demo;
+}
+
+/**
+ * reset demo/tutorial state
+ *
+ */
+void UTouchBlueprintFunctionLibrary::resetState() {
+    if (isTutorial() || isDemo()) {
+        updateSettings(_save_u_size, _save_v_size, _save_w_size, _save_width, _save_height, _save_depth);
+    }
+    else {
+        initMaze();
+    }
+    setTutorial(false);
+    setDemo(false);
+}
+
+/**
+ * return the product version
+ *
+ * @return {FString}
+ */
+FString UTouchBlueprintFunctionLibrary::getProjectVersion() {
+    return GetDefault<UGeneralProjectSettings>()->ProjectVersion;
+}
 /**
  * Move the player to the specified Position
  *

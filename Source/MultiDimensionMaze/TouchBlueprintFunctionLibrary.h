@@ -9,6 +9,7 @@
 #include "Components/SkyLightComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GeneralProjectSettings.h"
 #include <cmath>
 #include <math.h>
 #include <set>
@@ -26,8 +27,20 @@ class MULTIDIMENSIONMAZE_API UTouchBlueprintFunctionLibrary : public UBlueprintF
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = "Touch")
-		static void touchScreen(bool isPress);
+		static bool isPlayerMoving();
 
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static bool hasUp();
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static bool hasDown();
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static bool hasLeft();
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static bool hasRight();
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static bool hasForward();
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static bool hasReverse();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
 		static bool hasUPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
@@ -41,6 +54,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dim")
 		static bool hasWMinus();
 
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static bool isUp();
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static bool isDown();
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static void turnPlayerUp(bool isPress);
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static void turnPlayerDown(bool isPress);
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static void turnPlayerLeft(bool isPress);
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static void turnPlayerRight(bool isPress);
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static void goPlayerForward(bool isPress);
+	UFUNCTION(BlueprintCallable, Category = "Dim")
+		static void turnPlayerReverse(bool isPress);
 	UFUNCTION(BlueprintCallable, Category = "Dim")
 		static void clickUPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
@@ -93,31 +122,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dim")
 		static float getPlayerRotationRoll();
 
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasUp();
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasDown();
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasLeft();
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasRight();
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasReverse();
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool isUp();
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool isDown();
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void turnPlayerUp(bool isPress);
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void turnPlayerDown(bool isPress);
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void turnPlayerLeft(bool isPress);
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void turnPlayerRight(bool isPress);
-	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void turnPlayerReverse(bool isPress);
-
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static int getUSize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
@@ -131,7 +135,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static int getZSize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
+		static int getDimensionSize(int dimensionIndex);
+	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static void updateSettings(int uSize, int vSize, int wSize, int xSize, int ySize, int zSize);
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+		static void initMaze();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static void changeWall();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
@@ -141,21 +149,45 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static void Tick(float DeltaTime);
 
+	UFUNCTION(BlueprintCallable, Category = "State")
+		static void setTutorial(bool tutorial);
+	UFUNCTION(BlueprintCallable, Category = "State")
+		static bool isTutorial();
+	UFUNCTION(BlueprintCallable, Category = "State")
+		static void setDemo(bool demo);
+	UFUNCTION(BlueprintCallable, Category = "State")
+		static bool isDemo();
+	UFUNCTION(BlueprintCallable, Category = "State")
+		static void resetState();
+
+	UFUNCTION(BlueprintPure, Category = "Meta")
+		static FString getProjectVersion();
+
 	static void setPlayer(ACharacter* player);
 	static void rotatePlayer(FRotator rotator);
 	static void movePlayer(bool isPress);
+	static Direction getPlayerForwardDirection();
 	static void ShowWin();
+	static void playWin();
+	static void FinishWin();
 	static void MovePlayerTo(Position pos);
 	static FVector PLAYER_UP;
 	static FVector PLAYER_FORWARD[];
 	static ACharacter* _player;
 
 private:
-	static void initMaze();
 	const static int DEFAULT_DIMENSION_SIZE = 5;
 	constexpr static float DEFAULT_PLAYER_SPEED = 0.2;
 	constexpr static float DEFAULT_CELL_SIZE = 1.0;
-	constexpr static float WIN_DISPLAY_TIME = 5.0;
+	const static int DEMO_U_DIMENSION = 1;
+	const static int DEMO_V_DIMENSION = 1;
+	const static int DEMO_W_DIMENSION = 2;
+	const static int DEMO_X_DIMENSION = 3;
+	const static int DEMO_Y_DIMENSION = 3;
+	const static int DEMO_Z_DIMENSION = 2;
+	const static int MAX_RAND_SEED = 1000000;
+	const static int RAND_SEED_COUNT = 1000;
+	static int RAND_SEEDS[RAND_SEED_COUNT];
 	static Position START;
 	static FRotator INIT_PLAYER_ROTATION;
 	static FVector INIT_PLAYER_FORWARD;
@@ -169,15 +201,23 @@ private:
 	static AController* _playerController;
 	static Position _playerPosition;
 
+	constexpr static float WIN_DISPLAY_TIME = 6.0;
+	static int randSeedIndex;
 	static int _u_size;
 	static int _v_size;
 	static int _w_size;
 	static int _depth;
 	static int _height;
 	static int _width;
+	static int _save_u_size;
+	static int _save_v_size;
+	static int _save_w_size;
+	static int _save_depth;
+	static int _save_height;
+	static int _save_width;
 	static float _playerSpeed;
 	static float _cellSize;
-	static float _win_showing_time;
-	static bool _win_showing;
 	static bool _win_shown;
+	static bool _is_tutorial;
+	static bool _is_demo;
 };

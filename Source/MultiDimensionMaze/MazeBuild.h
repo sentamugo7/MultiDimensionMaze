@@ -16,6 +16,10 @@
 #include "Math/Color.h"
 #include "Components/TextRenderComponent.h"
 #include "Engine/TextRenderActor.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Particles/ParticleSystem.h"
 #include "MazeBuild.generated.h"
 
 static const int MIN_DIMENSION_SIZE = 1; // minimum size of any dimension
@@ -50,6 +54,8 @@ static const int MIN_VIRTUAL_DIRECTION = U_PLUS;
 static const int MAX_VIRTUAL_DIRECTION = W_MINUS;
 static const int MIN_REAL_DIRECTION = UP_;
 static const int MAX_REAL_DIRECTION = WEST;
+static const int TEXTURE_COUNT = 5;
+
 static const FRotator WALL_ROTATOR[DIRECTION_COUNT] = { NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, X_ROTATOR, X_ROTATOR, Y_ROTATOR, Y_ROTATOR, NO_ROTATOR, NO_ROTATOR };
 
 static const std::set<Direction> wallDirs = { UP_, SOUTH, EAST };
@@ -62,10 +68,15 @@ class MULTIDIMENSIONMAZE_API AMazeBuild : public AActor
 	
 public:
 	UPROPERTY()
-		class USoundWave* WinSoundWave;
-	UFUNCTION(BlueprintImplementableEvent, Category="Output")
-		void setWin();
-	// Sets default values for this actor's properties
+		class UParticleSystem* FireworksParticleSystem;
+	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
+		void playFireworksSound();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
+		void startShowWin();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
+		void endShowWin();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
+		void displayRandSeed(int randSeed);
 	static constexpr double CUBE_ACTUAL_SIZE = 80.0;
 	static constexpr double CUBE_SIZE = CUBE_ACTUAL_SIZE / DEFAULT_SIZE;
 	static constexpr double WALL_RATIO = 1.0 / 100.0;
@@ -77,6 +88,7 @@ public:
 	static constexpr double DIM_LETTER_LONG = 3 * DIM_LETTER_SHORT;
 
 	AMazeBuild();
+	void BeginPlay();
 	void NewMaze(int u_size, int v_size, int w_size, int depth, int height, int width);
 	void startMaze();
 	Position MoveDimension(Position pos, Direction dir);
@@ -90,7 +102,7 @@ public:
 private:
 	void OuterWall(Position pos);
 	void InnerWall(Position pos);
-	void Termination(Position pos);
+	void Termination(Position pos, bool isStart);
 	void RotateDimensionLetters(USceneComponent* letters, Direction dir);
 	UInstancedStaticMeshComponent* DimensionLetter(Position pos, Direction dir);
 	void DimensionText(Position pos);
@@ -99,10 +111,14 @@ private:
 	void DisplayMaze();
 	void SetDimension(Position pos);
 	FVector positionToLocation(Position pos, FVector delta);
+	void TriggerFireworks();
 
 	UInstancedStaticMeshComponent* createWall(Direction dir, Position pos);
 	UInstancedStaticMeshComponent* createTermination(Direction dir, bool isStart);
+	static constexpr float FIREWORKS_DELTA_TIME = 0.5f;
+	static constexpr float FIREWORKS_DELTA_DELTA_END_LOCATION = 10.0f;
 	static const FVector DELTA_WALL[DIRECTION_COUNT];
+	static const FVector FIREWORKS_DELTA_END_LOCATION[9];
 
 	int selectU = 0;
 	int selectV = 0;
@@ -114,17 +130,22 @@ private:
 	UStaticMesh* TerminationMeshRef;
 	UMaterial* StartMaterial;
 	UMaterial* EndMaterial;
-	UMaterial* Wall1Material;
-	UMaterial* Wall2Material;
-	UMaterial* Wall3Material;
-	UMaterial* Wall4Material;
-	UMaterial* Wall5Material;
-	UMaterial* WallMaterial;
+
+	UMaterialInstanceDynamic* DynamicMaterial;
+	UMaterial* WallTestMaterial;
+	UMaterialInstanceDynamic* WallTest2Material;
+	UMaterial* WallParam;
+	int WallTextureIndex = 0;
+	UMaterialInstanceDynamic* WallMaterials[6];
+	UTexture2D* TextureColor[TEXTURE_COUNT];
+	UTexture2D* TextureNormal[TEXTURE_COUNT];
 	UMaterial* UDimensionMaterial;
 	UMaterial* VDimensionMaterial;
 	UMaterial* WDimensionMaterial;
 	BacktrackGenerator backtrackGenerator;
 private:
+	FTimerHandle TriggerFireworkTimerHandle;
+	int fireworksCount;
  	std::vector<UMaterial*> DIMENSION_MATERIAL;
 	std::vector<UInstancedStaticMeshComponent*> DIM_LETTERS;
 

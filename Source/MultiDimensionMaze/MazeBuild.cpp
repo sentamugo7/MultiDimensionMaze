@@ -10,6 +10,19 @@ const FVector AMazeBuild::DELTA_WALL[DIRECTION_COUNT] = {
 	FVector( 0.5,  0.0, -0.5),
 	FVector(-0.5,  0.0, -0.5)
 };
+
+const FVector AMazeBuild::FIREWORKS_DELTA_END_LOCATION[9] = {
+	FVector(0, 0, 0),
+	FVector(-FIREWORKS_DELTA_DELTA_END_LOCATION, -FIREWORKS_DELTA_DELTA_END_LOCATION, -FIREWORKS_DELTA_DELTA_END_LOCATION),
+	FVector(-FIREWORKS_DELTA_DELTA_END_LOCATION, -FIREWORKS_DELTA_DELTA_END_LOCATION, +FIREWORKS_DELTA_DELTA_END_LOCATION),
+	FVector(-FIREWORKS_DELTA_DELTA_END_LOCATION, +FIREWORKS_DELTA_DELTA_END_LOCATION, -FIREWORKS_DELTA_DELTA_END_LOCATION),
+	FVector(-FIREWORKS_DELTA_DELTA_END_LOCATION, +FIREWORKS_DELTA_DELTA_END_LOCATION, +FIREWORKS_DELTA_DELTA_END_LOCATION),
+	FVector(+FIREWORKS_DELTA_DELTA_END_LOCATION, -FIREWORKS_DELTA_DELTA_END_LOCATION, -FIREWORKS_DELTA_DELTA_END_LOCATION),
+	FVector(+FIREWORKS_DELTA_DELTA_END_LOCATION, -FIREWORKS_DELTA_DELTA_END_LOCATION, +FIREWORKS_DELTA_DELTA_END_LOCATION),
+	FVector(+FIREWORKS_DELTA_DELTA_END_LOCATION, +FIREWORKS_DELTA_DELTA_END_LOCATION, -FIREWORKS_DELTA_DELTA_END_LOCATION),
+	FVector(+FIREWORKS_DELTA_DELTA_END_LOCATION, +FIREWORKS_DELTA_DELTA_END_LOCATION, +FIREWORKS_DELTA_DELTA_END_LOCATION),
+};
+
 static const FVector WALL_SCALE(AMazeBuild::WALL_THICKNESS, AMazeBuild::WALL_SIZE, AMazeBuild::WALL_SIZE);
 static const FVector TERMINATION_SCALE(AMazeBuild::TERMINATION_DIAMETER, AMazeBuild::TERMINATION_DIAMETER, AMazeBuild::TERMINATION_DIAMETER);
 static const FVector LETTER_SCALE(TEXT_SCALE, TEXT_SCALE, TEXT_SCALE);
@@ -32,18 +45,9 @@ AMazeBuild::AMazeBuild() {
 	StartMaterial = StartMaterialRef.Object;
 	static ConstructorHelpers::FObjectFinder<UMaterial> EndMaterialRef(TEXT("Material'/Game/Materials/End.End'"));
 	EndMaterial = EndMaterialRef.Object;
-	static ConstructorHelpers::FObjectFinder<UMaterial> Wall1MaterialRef(TEXT("Material'/Game/Materials/Wall1.Wall1'"));
-	Wall1Material = Wall1MaterialRef.Object;
-	static ConstructorHelpers::FObjectFinder<UMaterial> Wall2MaterialRef(TEXT("Material'/Game/Materials/Wall2.Wall2'"));
-	Wall2Material = Wall2MaterialRef.Object;
-	static ConstructorHelpers::FObjectFinder<UMaterial> Wall3MaterialRef(TEXT("Material'/Game/Materials/Wall3.Wall3'"));
-	Wall3Material = Wall3MaterialRef.Object;
-	static ConstructorHelpers::FObjectFinder<UMaterial> Wall4MaterialRef(TEXT("Material'/Game/Materials/Wall4.Wall4'"));
-	Wall4Material = Wall4MaterialRef.Object;
-	static ConstructorHelpers::FObjectFinder<UMaterial> Wall5MaterialRef(TEXT("Material'/Game/Materials/Wall5.Wall5'"));
-	Wall5Material = Wall5MaterialRef.Object;
 
-	WallMaterial = Wall1Material;
+	static ConstructorHelpers::FObjectFinder<UMaterial> WallParamRef(TEXT("Material'/Game/Materials/Wall_Param.Wall_Param'"));
+	WallParam = WallParamRef.Object;
 
 	static ConstructorHelpers::FObjectFinder<UMaterial> UDimensionMaterialRef(TEXT("Material'/Game/Materials/UDimension.UDimension'"));
 	UDimensionMaterial = UDimensionMaterialRef.Object;
@@ -59,8 +63,63 @@ AMazeBuild::AMazeBuild() {
 	DIMENSION_MATERIAL.push_back(WDimensionMaterial);
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	// Init Audio Resource
-	static ConstructorHelpers::FObjectFinder<USoundWave> winAudioResource(TEXT("SoundWave'/Game/Sounds/270545__littlerobotsoundfactory__jingle-win-01.270545__littlerobotsoundfactory__jingle-win-01'"));
-	WinSoundWave = winAudioResource.Object;
+//	static ConstructorHelpers::FObjectFinder<USoundWave> fireworkAudioResource(TEXT("SoundWave'/Game/Sounds/336008__rudmer-rotteveel__whistle-and-explosion-single-firework-cropped.336008__rudmer-rotteveel__whistle-and-explosion-single-firework-cropped'"));
+//	FireworkSoundWave = fireworkAudioResource.Object;
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> fireworks(TEXT("ParticleSystem '/Game/Materials/Fireworks_P.Fireworks_P'"));
+	FireworksParticleSystem = fireworks.Object;
+
+	FString PathToLoad;
+	// set Textures
+	PathToLoad = "Texture2D'/Game/Textures/T_Brick_Clay_Old_D.T_Brick_Clay_Old_D'";
+	TextureColor[0] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+	PathToLoad = "Texture2D'/Game/Textures/T_Brick_Clay_Old_N.T_Brick_Clay_Old_N'";
+	TextureNormal[0] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+	PathToLoad = "Texture2D'/Game/Textures/T_Rock_Basalt_D.T_Rock_Basalt_D'";
+	TextureColor[1] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+	PathToLoad = "Texture2D'/Game/Textures/T_Rock_Basalt_N.T_Rock_Basalt_N'";
+	TextureNormal[1] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+	PathToLoad = "Texture2D'/Game/Textures/T_Metal_Rust_D.T_Metal_Rust_D'";
+	TextureColor[2] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+	PathToLoad = "Texture2D'/Game/Textures/T_Metal_Rust_N.T_Metal_Rust_N'";
+	TextureNormal[2] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+	PathToLoad = "Texture2D'/Game/Textures/T_Wood_Pine_D.T_Wood_Pine_D'";
+	TextureColor[3] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+	PathToLoad = "Texture2D'/Game/Textures/T_Wood_Pine_N.T_Wood_Pine_N'";
+	TextureNormal[3] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+	PathToLoad = "Texture2D'/Game/Textures/T_Metal_Steel_D.T_Metal_Steel_D'";
+	TextureColor[4] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+	PathToLoad = "Texture2D'/Game/Textures/T_Metal_Steel_N.T_Metal_Steel_N'";
+	TextureNormal[4] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+}
+
+// Called when the game starts or when spawned
+void AMazeBuild::BeginPlay() {
+	Super::BeginPlay();
+	// set Material offsets
+	UMaterialInstanceDynamic* Wall0Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_0_Param"));
+	Wall0Material->SetScalarParameterValue("U_offset", 0);
+	Wall0Material->SetScalarParameterValue("V_offset", 0);
+	WallMaterials[0] = Wall0Material;
+	UMaterialInstanceDynamic* Wall1Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_1_Param"));
+	Wall1Material->SetScalarParameterValue("U_offset", 1);
+	Wall1Material->SetScalarParameterValue("V_offset", 0);
+	WallMaterials[1] = Wall1Material;
+	UMaterialInstanceDynamic* Wall2Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_2_Param"));
+	Wall2Material->SetScalarParameterValue("U_offset", 2);
+	Wall2Material->SetScalarParameterValue("V_offset", 0);
+	WallMaterials[2] = Wall2Material;
+	UMaterialInstanceDynamic* Wall3Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_3_Param"));
+	Wall3Material->SetScalarParameterValue("U_offset", 0);
+	Wall3Material->SetScalarParameterValue("V_offset", 1);
+	WallMaterials[3] = Wall3Material;
+	UMaterialInstanceDynamic* Wall4Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_4_Param"));
+	Wall4Material->SetScalarParameterValue("U_offset", 1);
+	Wall4Material->SetScalarParameterValue("V_offset", 1);
+	WallMaterials[4] = Wall4Material;
+	UMaterialInstanceDynamic* Wall5Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_5_Param"));
+	Wall5Material->SetScalarParameterValue("U_offset", 2);
+	Wall5Material->SetScalarParameterValue("V_offset", 1);
+	WallMaterials[5] = Wall5Material;
 }
 
 /**
@@ -98,7 +157,7 @@ UInstancedStaticMeshComponent* AMazeBuild::createWall(Direction dir, Position po
 	FVector wallLocation = positionToLocation(pos, DELTA_WALL[dir]);
 	FTransform wallTransform(wallRotator, wallLocation, WALL_SCALE);
 	WallComp->AddInstance(wallTransform);
-	WallComp->SetMaterial(0, WallMaterial);
+	WallComp->SetMaterial(0, WallMaterials[dir - UP_]);
 	WallComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
  	WallComp->SetVisibility(true);
 	return WallComp;
@@ -108,8 +167,9 @@ UInstancedStaticMeshComponent* AMazeBuild::createWall(Direction dir, Position po
  * Create a termination (start/end display) at the specified Position
  *
  * @param {Position} pos
+ * @param {bool} isStart
  */
-void AMazeBuild::Termination(Position pos) {
+void AMazeBuild::Termination(Position pos, bool isStart) {
 	UInstancedStaticMeshComponent* TerminationComp = NewObject<UInstancedStaticMeshComponent>(this, (pos == START) ? "START" : "END");
 	FRotator terminationRotator = NO_ROTATOR;
 	TerminationComp->RegisterComponent();
@@ -120,9 +180,10 @@ void AMazeBuild::Termination(Position pos) {
 	FTransform transform(terminationRotator, terminationLocation, TERMINATION_SCALE);
 	TerminationComp->AddInstance(transform);
 	TerminationComp->SetMaterial(0, (pos == START) ? StartMaterial : EndMaterial);
+	//TerminationComp->SetMaterial(0, Wall1Material);
 	TerminationComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	TerminationComp->SetVisibility(true);
-	if (pos == START) {
+	if (isStart) {
 		startTermination = TerminationComp;
 	}
 	else {
@@ -243,6 +304,10 @@ void AMazeBuild::ProcessCell(Position pos) {
 	DimensionText(pos);
 }
 
+/**
+ * Clear the Maze Build
+ *
+ */
 void AMazeBuild::clearBuild() {
 	TArray<UActorComponent*> components = this->GetInstanceComponents();
 	for (UActorComponent* component : components) {
@@ -260,18 +325,18 @@ void AMazeBuild::clearBuild() {
  */
 void AMazeBuild::DisplayMaze() {
 	clearBuild();
-	walls.resize(GetMaze().getMaxDimension()+1);
-	dimensionLetters.resize(GetMaze().getMaxDimension() + 1);
-	dimensionLetter.resize(GetMaze().getMaxDimension() + 1);
-	for (int z_loop = 0; z_loop < GetMaze().getMaxDimension() + 1; z_loop++) {
-		walls[z_loop].resize(GetMaze().getMaxDimension() + 1);
-		dimensionLetters[z_loop].resize(GetMaze().getMaxDimension() + 1);
-		dimensionLetter[z_loop].resize(GetMaze().getMaxDimension() + 1);
-		for (int y_loop = 0; y_loop < GetMaze().getMaxDimension() + 1; y_loop++) {
-			walls[z_loop][y_loop].resize(GetMaze().getMaxDimension() + 1);
-			dimensionLetters[z_loop][y_loop].resize(GetMaze().getMaxDimension() + 1);
-			dimensionLetter[z_loop][y_loop].resize(GetMaze().getMaxDimension() + 1);
-			for (int x_loop = 0; x_loop < GetMaze().getMaxDimension() + 1; x_loop++) {
+	walls.resize(GetMaze().getDepth()+1);
+	dimensionLetters.resize(GetMaze().getDepth() + 1);
+	dimensionLetter.resize(GetMaze().getDepth() + 1);
+	for (int z_loop = 0; z_loop < GetMaze().getDepth() + 1; z_loop++) {
+		walls[z_loop].resize(GetMaze().getHeight() + 1);
+		dimensionLetters[z_loop].resize(GetMaze().getHeight() + 1);
+		dimensionLetter[z_loop].resize(GetMaze().getHeight() + 1);
+		for (int y_loop = 0; y_loop < GetMaze().getHeight() + 1; y_loop++) {
+			walls[z_loop][y_loop].resize(GetMaze().getWidth() + 1);
+			dimensionLetters[z_loop][y_loop].resize(GetMaze().getWidth() + 1);
+			dimensionLetter[z_loop][y_loop].resize(GetMaze().getWidth() + 1);
+			for (int x_loop = 0; x_loop < GetMaze().getWidth() + 1; x_loop++) {
 				walls[z_loop][y_loop][x_loop].resize(DIRECTION_COUNT);
 				dimensionLetter[z_loop][y_loop][x_loop].resize(DIRECTION_COUNT);
 			}
@@ -284,9 +349,9 @@ void AMazeBuild::DisplayMaze() {
 //	for (int uLoop = 0; uLoop < _maze->getUSize(); uLoop++) {
 //		for (int vLoop = 0; vLoop < _maze->getVSize(); vLoop++) {
 //			for (int wLoop = 0; wLoop < _maze->getWSize(); wLoop++) {
-				for (int zLoop = 0; zLoop <= GetMaze().getMaxDimension(); zLoop++) {
-					for (int yLoop = 0; yLoop <= GetMaze().getMaxDimension(); yLoop++) {
-						for (int xLoop = 0; xLoop <= GetMaze().getMaxDimension(); xLoop++) {
+				for (int zLoop = 0; zLoop <= GetMaze().getDepth(); zLoop++) {
+					for (int yLoop = 0; yLoop <= GetMaze().getHeight(); yLoop++) {
+						for (int xLoop = 0; xLoop <= GetMaze().getWidth(); xLoop++) {
 							ProcessCell(Position(uLoop, vLoop, wLoop, zLoop, yLoop, xLoop));
 						}
 					}
@@ -294,8 +359,8 @@ void AMazeBuild::DisplayMaze() {
 //			}
 //		}
 //	}
-	Termination(START);
-	Termination(Position(0, 0, 0, GetMaze().getDepth() - 1, GetMaze().getHeight() - 1, GetMaze().getWidth() - 1));
+	Termination(START, true);
+	Termination(Position(0, 0, 0, GetMaze().getDepth() - 1, GetMaze().getHeight() - 1, GetMaze().getWidth() - 1), false);
 }
 
 /**
@@ -304,9 +369,9 @@ void AMazeBuild::DisplayMaze() {
  * @param {Direction} newDir
  */
 void AMazeBuild::ChangeDirection(Direction newDir) {
-	for (int zLoop = 0; zLoop <= GetMaze().getMaxDimension(); zLoop++) {
-		for (int yLoop = 0; yLoop <= GetMaze().getMaxDimension(); yLoop++) {
-			for (int xLoop = 0; xLoop <= GetMaze().getMaxDimension(); xLoop++) {
+	for (int zLoop = 0; zLoop <= GetMaze().getDepth(); zLoop++) {
+		for (int yLoop = 0; yLoop <= GetMaze().getHeight(); yLoop++) {
+			for (int xLoop = 0; xLoop <= GetMaze().getWidth(); xLoop++) {
 				Position pos(selectU, selectV, selectW, zLoop, yLoop, xLoop);
 				USceneComponent* letters = dimensionLetters[pos.getZ()][pos.getY()][pos.getX()];
 				RotateDimensionLetters(letters, newDir);
@@ -337,9 +402,9 @@ void AMazeBuild::SetDimension(Position pos) {
 	selectU = pos.getU();
 	selectV = pos.getV();
 	selectW = pos.getW();
-	for (int zLoop = 0; zLoop <= GetMaze().getMaxDimension(); zLoop++) {
-		for (int yLoop = 0; yLoop <= GetMaze().getMaxDimension(); yLoop++) {
-			for (int xLoop = 0; xLoop <= GetMaze().getMaxDimension(); xLoop++) {
+	for (int zLoop = 0; zLoop <= GetMaze().getDepth(); zLoop++) {
+		for (int yLoop = 0; yLoop <= GetMaze().getHeight(); yLoop++) {
+			for (int xLoop = 0; xLoop <= GetMaze().getWidth(); xLoop++) {
 				for (Direction dirLoop : wallDirs) {
 					UInstancedStaticMeshComponent* wall = walls[zLoop][yLoop][xLoop][dirLoop];
 					if (wall != NULL) {
@@ -424,37 +489,29 @@ Maze AMazeBuild::GetMaze() {
 }
 
 /**
- * Change Wall material for all walls to the newly selected material.
+ * Change Wall texture for all walls to the newly selected material.
  *
  */
 void AMazeBuild::changeWall() {
-	if (WallMaterial == Wall1Material) {
-		WallMaterial = Wall2Material;
-	} else
-	if (WallMaterial == Wall2Material) {
-		WallMaterial = Wall3Material;
-	} else
-	if (WallMaterial == Wall3Material) {
-		WallMaterial = Wall4Material;
-	} else
-	if (WallMaterial == Wall4Material) {
-		WallMaterial = Wall5Material;
-	} else
-	if (WallMaterial == Wall5Material) {
-		WallMaterial = Wall1Material;
-	} else {
-		WallMaterial = Wall1Material;
+	WallTextureIndex = (WallTextureIndex + 1) % TEXTURE_COUNT;
+	for (int dirLoop = UP_; dirLoop <= WEST; dirLoop++) {
+		WallMaterials[dirLoop - UP_]->SetTextureParameterValue(FName("color"), TextureColor[WallTextureIndex]);
+		WallMaterials[dirLoop - UP_]->SetTextureParameterValue(FName("normal"), TextureNormal[WallTextureIndex]);
 	}
-	for (int zLoop = 0; zLoop < walls.size(); zLoop++) {
-		for (int yLoop = 0; yLoop < walls.size(); yLoop++) {
-			for (int xLoop = 0; xLoop < walls.size(); xLoop++) {
-				for (int dirLoop = 0; dirLoop < DIRECTION_COUNT; dirLoop++) {
-					if (walls[zLoop][yLoop][xLoop][dirLoop] != NULL) {
-						walls[zLoop][yLoop][xLoop][dirLoop]->SetMaterial(0, WallMaterial);
-					}
-				}
-			}
-		}
+}
+
+/**
+ * Show fireworks for win
+ *
+ */
+void AMazeBuild::TriggerFireworks() {
+	FVector endLocation = positionToLocation(GetMaze().getEnd());
+	UGameplayStatics::SpawnEmitterAtLocation(this, FireworksParticleSystem, endLocation + FIREWORKS_DELTA_END_LOCATION[fireworksCount]);
+//	UGameplayStatics::PlaySound2D(this, FireworkSoundWave);
+	fireworksCount--;
+	playFireworksSound();
+	if (fireworksCount > 0) {
+		GetWorld()->GetTimerManager().SetTimer(TriggerFireworkTimerHandle, this, &AMazeBuild::TriggerFireworks, FIREWORKS_DELTA_TIME, false);
 	}
 }
 
@@ -463,5 +520,7 @@ void AMazeBuild::changeWall() {
  *
  */
 void AMazeBuild::playWin() {
-	UGameplayStatics::PlaySound2D(this, WinSoundWave);
+	startShowWin();
+	fireworksCount = 9;
+	TriggerFireworks();
 }

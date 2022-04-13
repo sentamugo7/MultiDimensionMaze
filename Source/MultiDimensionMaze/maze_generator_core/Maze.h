@@ -26,7 +26,6 @@ public:
 	int getDepth();
 	int getHeight();
 	int getWidth();
-	int getMaxDimension();
 	int getDimensionCount();
 	bool isPosInMaze(Position pos);
 	bool getPassage(Position pos, Direction dir);
@@ -34,6 +33,8 @@ public:
 	Position getEnd();
 	Direction getHintAt(Position pos);
 	void solve();
+	int solutionCount();
+	int basisCount();
 
 
 private:
