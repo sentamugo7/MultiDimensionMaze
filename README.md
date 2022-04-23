@@ -21,7 +21,7 @@ To collapse a dimension, set the size of that dimension to 1.
 When done, click the **`Apply`** button to set the new maze sizes.  
 Click **`Cancel`** to give up any changes.  
 - at least two of the dimensions must be not collapsed (not size one).  
-- if the total size of the maze is too big, an error message is displayed.  
+- if the total size of the maze is too big, an error message is displayed.
 You can turn the sound on or off, or replay a maze by entering the seed number.  
 ---  
 Maze generator - James Clark - https://github.com/sbj42/maze-generator - backtrack generator  
