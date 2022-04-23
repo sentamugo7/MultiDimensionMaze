@@ -18,12 +18,12 @@ Also you can see the random number seed in the bottom right. Use this number in 
 To change Preferences, click on the Settings button on the main menu.  
 On the settings page, you can change the size of each dimension of the maze, drag the slider for that dimension to the new size.  
 To collapse a dimension, set the size of that dimension to 1.  
+You can turn the sound on or off, or replay a maze by entering the seed number.  
 When done, click the **`Apply`** button to set the new maze sizes.  
 Click **`Cancel`** to give up any changes.  
+
 - at least two of the dimensions must be not collapsed (not size one).  
 - if the total size of the maze is too big, an error message is displayed.  
-
-You can turn the sound on or off, or replay a maze by entering the seed number.  
 ---  
 Maze generator - James Clark - https://github.com/sbj42/maze-generator - backtrack generator  
 Sounds - https://freesound.org  
