@@ -122,7 +122,7 @@ private:
 	static constexpr float FIREWORKS_DELTA_DELTA_END_LOCATION = 10.0f;
 	static const FVector DELTA_WALL[DIRECTION_COUNT];
 	static const FVector FIREWORKS_DELTA_END_LOCATION[9];
-	static const int WALL_TEXTURE_COUNT = 1 + WEST - UP_;
+	static const int WALL_TEXTURE_COUNT = WEST - UP_;
 
 	int selectU = 0;
 	int selectV = 0;

@@ -423,19 +423,19 @@ void AMazeBuild::SetDimension(Position pos) {
 	startTermination->SetVisibility(pos.getU() == 0 && pos.getV() == 0 && pos.getW() == 0);
 	endTermination->SetVisibility(pos.getU() == GetMaze().getEnd().getU() && pos.getV() == GetMaze().getEnd().getV() && pos.getW() == GetMaze().getEnd().getW());
 
-	int dimOffset = (pos.getU() % 2) +( pos.getV() % 2) + (pos.getW() % 2);
-	WallMaterials[0]->SetScalarParameterValue("U_offset", 0);
-	WallMaterials[0]->SetScalarParameterValue("V_offset", (dimOffset +  0) % 6);
-	WallMaterials[1]->SetScalarParameterValue("U_offset", 1);
-	WallMaterials[1]->SetScalarParameterValue("V_offset", (dimOffset +  1) % 6);
-	WallMaterials[2]->SetScalarParameterValue("U_offset", 2);
-	WallMaterials[2]->SetScalarParameterValue("V_offset", (dimOffset +  2) % 6);
-	WallMaterials[3]->SetScalarParameterValue("U_offset", 3);
-	WallMaterials[3]->SetScalarParameterValue("V_offset", (dimOffset +  3) % 6);
-	WallMaterials[4]->SetScalarParameterValue("U_offset", 4);
-	WallMaterials[4]->SetScalarParameterValue("V_offset", (dimOffset +  4) % 6);
-	WallMaterials[5]->SetScalarParameterValue("U_offset", 5);
-	WallMaterials[5]->SetScalarParameterValue("V_offset", (dimOffset +  5) % 6);
+	int dimOffset = pos.getU() + pos.getV() + pos.getW();
+	WallMaterials[0]->SetScalarParameterValue("U_offset", (dimOffset +  0) % 3);
+	WallMaterials[0]->SetScalarParameterValue("V_offset", (dimOffset +  0) % 2);
+	WallMaterials[1]->SetScalarParameterValue("U_offset", (dimOffset +  1) % 3);
+	WallMaterials[1]->SetScalarParameterValue("V_offset", (dimOffset +  0) % 2);
+	WallMaterials[2]->SetScalarParameterValue("U_offset", (dimOffset +  2) % 3);
+	WallMaterials[2]->SetScalarParameterValue("V_offset", (dimOffset +  0) % 2);
+	WallMaterials[3]->SetScalarParameterValue("U_offset", (dimOffset +  0) % 3);
+	WallMaterials[3]->SetScalarParameterValue("V_offset", (dimOffset +  1) % 2);
+	WallMaterials[4]->SetScalarParameterValue("U_offset", (dimOffset +  1) % 3);
+	WallMaterials[4]->SetScalarParameterValue("V_offset", (dimOffset +  1) % 2);
+	WallMaterials[5]->SetScalarParameterValue("U_offset", (dimOffset +  2) % 3);
+	WallMaterials[5]->SetScalarParameterValue("V_offset", (dimOffset +  1) % 2);
 }
 
 /**
