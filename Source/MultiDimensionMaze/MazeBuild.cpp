@@ -39,8 +39,10 @@ AMazeBuild::AMazeBuild() {
 	PlusMeshRef = PlusMesh.Object;
 	ConstructorHelpers::FObjectFinder<UStaticMesh>MinusMesh(TEXT("StaticMesh'/Game/Shapes/minus.minus'"));
 	MinusMeshRef = MinusMesh.Object;
-	ConstructorHelpers::FObjectFinder<UStaticMesh>TerminationMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Sphere.Shape_Sphere'"));
-	TerminationMeshRef = TerminationMesh.Object;
+	ConstructorHelpers::FObjectFinder<UStaticMesh>StartMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
+	StartMeshRef = StartMesh.Object;
+	ConstructorHelpers::FObjectFinder<UStaticMesh>EndMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Sphere.Shape_Sphere'"));
+	EndMeshRef = EndMesh.Object;
 	static ConstructorHelpers::FObjectFinder<UMaterial> StartMaterialRef(TEXT("Material'/Game/Materials/Start.Start'"));
 	StartMaterial = StartMaterialRef.Object;
 	static ConstructorHelpers::FObjectFinder<UMaterial> EndMaterialRef(TEXT("Material'/Game/Materials/End.End'"));
@@ -97,28 +99,16 @@ void AMazeBuild::BeginPlay() {
 	Super::BeginPlay();
 	// set Material offsets
 	UMaterialInstanceDynamic* Wall0Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_0_Param"));
-	Wall0Material->SetScalarParameterValue("U_offset", 0);
-	Wall0Material->SetScalarParameterValue("V_offset", 0);
 	WallMaterials[0] = Wall0Material;
 	UMaterialInstanceDynamic* Wall1Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_1_Param"));
-	Wall1Material->SetScalarParameterValue("U_offset", 1);
-	Wall1Material->SetScalarParameterValue("V_offset", 0);
 	WallMaterials[1] = Wall1Material;
 	UMaterialInstanceDynamic* Wall2Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_2_Param"));
-	Wall2Material->SetScalarParameterValue("U_offset", 2);
-	Wall2Material->SetScalarParameterValue("V_offset", 0);
 	WallMaterials[2] = Wall2Material;
 	UMaterialInstanceDynamic* Wall3Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_3_Param"));
-	Wall3Material->SetScalarParameterValue("U_offset", 0);
-	Wall3Material->SetScalarParameterValue("V_offset", 1);
 	WallMaterials[3] = Wall3Material;
 	UMaterialInstanceDynamic* Wall4Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_4_Param"));
-	Wall4Material->SetScalarParameterValue("U_offset", 1);
-	Wall4Material->SetScalarParameterValue("V_offset", 1);
 	WallMaterials[4] = Wall4Material;
 	UMaterialInstanceDynamic* Wall5Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_5_Param"));
-	Wall5Material->SetScalarParameterValue("U_offset", 2);
-	Wall5Material->SetScalarParameterValue("V_offset", 1);
 	WallMaterials[5] = Wall5Material;
 }
 
@@ -173,14 +163,13 @@ void AMazeBuild::Termination(Position pos, bool isStart) {
 	UInstancedStaticMeshComponent* TerminationComp = NewObject<UInstancedStaticMeshComponent>(this, (pos == START) ? "START" : "END");
 	FRotator terminationRotator = NO_ROTATOR;
 	TerminationComp->RegisterComponent();
-	TerminationComp->SetStaticMesh(TerminationMeshRef);
+	TerminationComp->SetStaticMesh((pos == START) ? StartMeshRef : EndMeshRef);
 	TerminationComp->SetFlags(RF_Transactional);
 	this->AddInstanceComponent(TerminationComp);
 	FVector terminationLocation = positionToLocation(pos);
 	FTransform transform(terminationRotator, terminationLocation, TERMINATION_SCALE);
 	TerminationComp->AddInstance(transform);
 	TerminationComp->SetMaterial(0, (pos == START) ? StartMaterial : EndMaterial);
-	//TerminationComp->SetMaterial(0, Wall1Material);
 	TerminationComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	TerminationComp->SetVisibility(true);
 	if (isStart) {
@@ -433,6 +422,20 @@ void AMazeBuild::SetDimension(Position pos) {
 	}
 	startTermination->SetVisibility(pos.getU() == 0 && pos.getV() == 0 && pos.getW() == 0);
 	endTermination->SetVisibility(pos.getU() == GetMaze().getEnd().getU() && pos.getV() == GetMaze().getEnd().getV() && pos.getW() == GetMaze().getEnd().getW());
+
+	int dimOffset = (pos.getU() % 2) +( pos.getV() % 2) + (pos.getW() % 2);
+	WallMaterials[0]->SetScalarParameterValue("U_offset", 0);
+	WallMaterials[0]->SetScalarParameterValue("V_offset", (dimOffset +  0) % 6);
+	WallMaterials[1]->SetScalarParameterValue("U_offset", 1);
+	WallMaterials[1]->SetScalarParameterValue("V_offset", (dimOffset +  1) % 6);
+	WallMaterials[2]->SetScalarParameterValue("U_offset", 2);
+	WallMaterials[2]->SetScalarParameterValue("V_offset", (dimOffset +  2) % 6);
+	WallMaterials[3]->SetScalarParameterValue("U_offset", 3);
+	WallMaterials[3]->SetScalarParameterValue("V_offset", (dimOffset +  3) % 6);
+	WallMaterials[4]->SetScalarParameterValue("U_offset", 4);
+	WallMaterials[4]->SetScalarParameterValue("V_offset", (dimOffset +  4) % 6);
+	WallMaterials[5]->SetScalarParameterValue("U_offset", 5);
+	WallMaterials[5]->SetScalarParameterValue("V_offset", (dimOffset +  5) % 6);
 }
 
 /**
@@ -494,9 +497,9 @@ Maze AMazeBuild::GetMaze() {
  */
 void AMazeBuild::changeWall() {
 	WallTextureIndex = (WallTextureIndex + 1) % TEXTURE_COUNT;
-	for (int dirLoop = UP_; dirLoop <= WEST; dirLoop++) {
-		WallMaterials[dirLoop - UP_]->SetTextureParameterValue(FName("color"), TextureColor[WallTextureIndex]);
-		WallMaterials[dirLoop - UP_]->SetTextureParameterValue(FName("normal"), TextureNormal[WallTextureIndex]);
+	for (int dirLoop = 0; dirLoop <= WALL_TEXTURE_COUNT; dirLoop++) {
+		WallMaterials[dirLoop]->SetTextureParameterValue(FName("color"), TextureColor[WallTextureIndex]);
+		WallMaterials[dirLoop]->SetTextureParameterValue(FName("normal"), TextureNormal[WallTextureIndex]);
 	}
 }
 

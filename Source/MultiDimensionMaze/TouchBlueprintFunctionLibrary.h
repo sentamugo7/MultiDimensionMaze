@@ -26,9 +26,6 @@ class MULTIDIMENSIONMAZE_API UTouchBlueprintFunctionLibrary : public UBlueprintF
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintCallable, Category = "Touch")
-		static bool isPlayerMoving();
-
 	UFUNCTION(BlueprintCallable, Category = "Dim")
 		static bool hasUp();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
@@ -137,17 +134,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static int getDimensionSize(int dimensionIndex);
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void updateSettings(int uSize, int vSize, int wSize, int xSize, int ySize, int zSize);
-	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void initMaze();
+		static void updateSettings(int uSize, int vSize, int wSize, int xSize, int ySize, int zSize, int seed);
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static void changeWall();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void newMap(AMazeBuild* mazeBuild, APlayerController* playerController, ASkyLight* skyLight);
+		static void newMap(AMazeBuild* mazeBuild, APlayerController* playerController, ASkyLight* skyLight, float animationDuration);
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static bool isWin();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void Tick(float DeltaTime);
+		static void MazeTick(float animationTime);
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+		static FString getScore();
 
 	UFUNCTION(BlueprintCallable, Category = "State")
 		static void setTutorial(bool tutorial);
@@ -163,9 +160,15 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Meta")
 		static FString getProjectVersion();
 
+	static void initMaze(int seed);
 	static void setPlayer(ACharacter* player);
-	static void rotatePlayer(FRotator rotator);
-	static void movePlayer(bool isPress);
+	static void startRotatePlayer(FRotator rotator);
+	static void finishRotatePlayer();
+	static void startPlayerForward(Position position);
+	static void finishPlayerForward();
+	static void startPlayerDimension(Direction direction);
+	static void switchPlayerDimension();
+
 	static Direction getPlayerForwardDirection();
 	static void ShowWin();
 	static void playWin();
@@ -195,12 +198,20 @@ private:
 
 	static AMazeBuild* _mazeBuild;
 	static USkyLightComponent* _skyLightComponent;
-	static bool _playerMoving;
 	static FRotator _playerRotator;
 	static FVector _playerForward;
 	static AController* _playerController;
 	static Position _playerPosition;
+	static int moveCount;
+	static FRotator oldRotation;
+	static FRotator newRotation;
+	static FVector oldPositionXYZ;
+	static FVector newPositionXYZ;
+	static Position newPosition;
+	static Direction dimensionTransitionDirection;
+	static bool isDimensionTransition;
 
+	static float _animationDuration;
 	constexpr static float WIN_DISPLAY_TIME = 6.0;
 	static int randSeedIndex;
 	static int _u_size;
@@ -215,7 +226,6 @@ private:
 	static int _save_depth;
 	static int _save_height;
 	static int _save_width;
-	static float _playerSpeed;
 	static float _cellSize;
 	static bool _win_shown;
 	static bool _is_tutorial;

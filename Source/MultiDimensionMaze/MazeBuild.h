@@ -77,6 +77,9 @@ public:
 		void endShowWin();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
 		void displayRandSeed(int randSeed);
+	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
+		void displayDimensionTransition(float displayPercent);
+
 	static constexpr double CUBE_ACTUAL_SIZE = 80.0;
 	static constexpr double CUBE_SIZE = CUBE_ACTUAL_SIZE / DEFAULT_SIZE;
 	static constexpr double WALL_RATIO = 1.0 / 100.0;
@@ -94,6 +97,7 @@ public:
 	Position MoveDimension(Position pos, Direction dir);
 	void ChangeDirection(Direction dir);
 	Position locationToPosition(int u, int v, int w, FVector location);
+	FVector positionToLocation(Position pos, FVector delta);
 	FVector positionToLocation(Position pos);
 	Maze GetMaze();
 	void changeWall();
@@ -110,7 +114,6 @@ private:
 	void clearBuild();
 	void DisplayMaze();
 	void SetDimension(Position pos);
-	FVector positionToLocation(Position pos, FVector delta);
 	void TriggerFireworks();
 
 	UInstancedStaticMeshComponent* createWall(Direction dir, Position pos);
@@ -119,6 +122,7 @@ private:
 	static constexpr float FIREWORKS_DELTA_DELTA_END_LOCATION = 10.0f;
 	static const FVector DELTA_WALL[DIRECTION_COUNT];
 	static const FVector FIREWORKS_DELTA_END_LOCATION[9];
+	static const int WALL_TEXTURE_COUNT = 1 + WEST - UP_;
 
 	int selectU = 0;
 	int selectV = 0;
@@ -127,7 +131,8 @@ private:
 	UStaticMesh* WallMeshRef;
 	UStaticMesh* PlusMeshRef;
 	UStaticMesh* MinusMeshRef;
-	UStaticMesh* TerminationMeshRef;
+	UStaticMesh* StartMeshRef;
+	UStaticMesh* EndMeshRef;
 	UMaterial* StartMaterial;
 	UMaterial* EndMaterial;
 
@@ -136,7 +141,7 @@ private:
 	UMaterialInstanceDynamic* WallTest2Material;
 	UMaterial* WallParam;
 	int WallTextureIndex = 0;
-	UMaterialInstanceDynamic* WallMaterials[6];
+	UMaterialInstanceDynamic* WallMaterials[WALL_TEXTURE_COUNT];
 	UTexture2D* TextureColor[TEXTURE_COUNT];
 	UTexture2D* TextureNormal[TEXTURE_COUNT];
 	UMaterial* UDimensionMaterial;
