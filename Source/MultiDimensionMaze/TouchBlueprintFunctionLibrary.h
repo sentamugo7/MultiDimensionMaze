@@ -39,17 +39,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dim")
 		static bool hasReverse();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasUPlus();
+		static bool hasAPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasUMinus();
+		static bool hasAMinus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasVPlus();
+		static bool hasBPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasVMinus();
+		static bool hasBMinus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasWPlus();
+		static bool hasCPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasWMinus();
+		static bool hasCMinus();
 
 	UFUNCTION(BlueprintCallable, Category = "Dim")
 		static bool isUp();
@@ -68,23 +68,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dim")
 		static void turnPlayerReverse(bool isPress);
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickUPlus();
+		static void clickAPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickUMinus();
+		static void clickAMinus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickVPlus();
+		static void clickBPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickVMinus();
+		static void clickBMinus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickWPlus();
+		static void clickCPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickWMinus();
+		static void clickCMinus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getPlayerPositionUDisplay();
+		static FString getPlayerPositionADisplay();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getPlayerPositionVDisplay();
+		static FString getPlayerPositionBDisplay();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getPlayerPositionWDisplay();
+		static FString getPlayerPositionCDisplay();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
 		static FString getPlayerPositionXDisplay();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
@@ -97,11 +97,11 @@ public:
 		static FString getOrientation();
 
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static int getPlayerPositionU();
+		static int getPlayerPositionA();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static int getPlayerPositionV();
+		static int getPlayerPositionB();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static int getPlayerPositionW();
+		static int getPlayerPositionC();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
 		static int getPlayerPositionX();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
@@ -120,11 +120,11 @@ public:
 		static float getPlayerRotationRoll();
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getUSize();
+		static int getASize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getVSize();
+		static int getBSize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getWSize();
+		static int getCSize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static int getXSize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
@@ -134,7 +134,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static int getDimensionSize(int dimensionIndex);
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void updateSettings(int uSize, int vSize, int wSize, int xSize, int ySize, int zSize, int seed);
+		static void updateSettings(int xSize, int ySize, int zSize, int aSize, int bSize, int cSize);
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+		static void initTutorialSettings();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static void changeWall();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
@@ -155,12 +157,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "State")
 		static bool isDemo();
 	UFUNCTION(BlueprintCallable, Category = "State")
+		static void setTooltip(bool tooltip);
+	UFUNCTION(BlueprintCallable, Category = "State")
+		static bool isTooltip();
+	UFUNCTION(BlueprintCallable, Category = "State")
 		static void resetState();
 
 	UFUNCTION(BlueprintPure, Category = "Meta")
 		static FString getProjectVersion();
 
-	static void initMaze(int seed);
+	static void initMaze();
 	static void setPlayer(ACharacter* player);
 	static void startRotatePlayer(FRotator rotator);
 	static void finishRotatePlayer();
@@ -182,19 +188,28 @@ private:
 	const static int DEFAULT_DIMENSION_SIZE = 5;
 	constexpr static float DEFAULT_PLAYER_SPEED = 0.2;
 	constexpr static float DEFAULT_CELL_SIZE = 1.0;
-	const static int DEMO_U_DIMENSION = 1;
-	const static int DEMO_V_DIMENSION = 1;
-	const static int DEMO_W_DIMENSION = 2;
+	const static int INIT_X_DIMENSION = 5;
+	const static int INIT_Y_DIMENSION = 5;
+	const static int INIT_Z_DIMENSION = 1;
+	const static int INIT_A_DIMENSION = 1;
+	const static int INIT_B_DIMENSION = 1;
+	const static int INIT_C_DIMENSION = 1;
 	const static int DEMO_X_DIMENSION = 3;
 	const static int DEMO_Y_DIMENSION = 3;
 	const static int DEMO_Z_DIMENSION = 2;
-	const static int MAX_RAND_SEED = 1000000;
-	const static int RAND_SEED_COUNT = 1000;
-	static int RAND_SEEDS[RAND_SEED_COUNT];
+	const static int DEMO_A_DIMENSION = 1;
+	const static int DEMO_B_DIMENSION = 2;
+	const static int DEMO_C_DIMENSION = 1;
 	static Position START;
 	static FRotator INIT_PLAYER_ROTATION;
 	static FVector INIT_PLAYER_FORWARD;
 	static FString MAIN_LEVEL_NAME;
+	const static int DEMO_SEED = 28943;
+	const static int MIN_DEMO_COUNT = 10;
+	const static int MAX_DEMO_COUNT = 20;
+	const static int TUTORIAL_SEED = 13166;
+	const static int MIN_TUTORIAL_COUNT = 10;
+	const static int MAX_TUTORIAL_COUNT = 20;
 
 	static AMazeBuild* _mazeBuild;
 	static USkyLightComponent* _skyLightComponent;
@@ -210,24 +225,26 @@ private:
 	static Position newPosition;
 	static Direction dimensionTransitionDirection;
 	static bool isDimensionTransition;
+	static float lastAnimationTime;
 
 	static float _animationDuration;
 	constexpr static float WIN_DISPLAY_TIME = 6.0;
-	static int randSeedIndex;
-	static int _u_size;
-	static int _v_size;
-	static int _w_size;
 	static int _depth;
 	static int _height;
 	static int _width;
-	static int _save_u_size;
-	static int _save_v_size;
-	static int _save_w_size;
+	static int _a_size;
+	static int _b_size;
+	static int _c_size;
 	static int _save_depth;
 	static int _save_height;
 	static int _save_width;
+	static int _save_a_size;
+	static int _save_b_size;
+	static int _save_c_size;
 	static float _cellSize;
+	static bool _initializing;
 	static bool _win_shown;
 	static bool _is_tutorial;
 	static bool _is_demo;
+	static bool _is_tooltip;
 };

@@ -51,18 +51,18 @@ AMazeBuild::AMazeBuild() {
 	static ConstructorHelpers::FObjectFinder<UMaterial> WallParamRef(TEXT("Material'/Game/Materials/Wall_Param.Wall_Param'"));
 	WallParam = WallParamRef.Object;
 
-	static ConstructorHelpers::FObjectFinder<UMaterial> UDimensionMaterialRef(TEXT("Material'/Game/Materials/UDimension.UDimension'"));
-	UDimensionMaterial = UDimensionMaterialRef.Object;
-	DIMENSION_MATERIAL.push_back(UDimensionMaterial);
-	DIMENSION_MATERIAL.push_back(UDimensionMaterial);
-	static ConstructorHelpers::FObjectFinder<UMaterial> VDimensionMaterialRef(TEXT("Material'/Game/Materials/VDimension.VDimension'"));
-	VDimensionMaterial = VDimensionMaterialRef.Object;
-	DIMENSION_MATERIAL.push_back(VDimensionMaterial);
-	DIMENSION_MATERIAL.push_back(VDimensionMaterial);
-	static ConstructorHelpers::FObjectFinder<UMaterial> WDimensionMaterialRef(TEXT("Material'/Game/Materials/WDimension.WDimension'"));
-	WDimensionMaterial = WDimensionMaterialRef.Object;
-	DIMENSION_MATERIAL.push_back(WDimensionMaterial);
-	DIMENSION_MATERIAL.push_back(WDimensionMaterial);
+	static ConstructorHelpers::FObjectFinder<UMaterial> ADimensionMaterialRef(TEXT("Material'/Game/Materials/ADimension.ADimension'"));
+	ADimensionMaterial = ADimensionMaterialRef.Object;
+	DIMENSION_MATERIAL.push_back(ADimensionMaterial);
+	DIMENSION_MATERIAL.push_back(ADimensionMaterial);
+	static ConstructorHelpers::FObjectFinder<UMaterial> BDimensionMaterialRef(TEXT("Material'/Game/Materials/BDimension.BDimension'"));
+	BDimensionMaterial = BDimensionMaterialRef.Object;
+	DIMENSION_MATERIAL.push_back(BDimensionMaterial);
+	DIMENSION_MATERIAL.push_back(BDimensionMaterial);
+	static ConstructorHelpers::FObjectFinder<UMaterial> CDimensionMaterialRef(TEXT("Material'/Game/Materials/CDimension.CDimension'"));
+	CDimensionMaterial = CDimensionMaterialRef.Object;
+	DIMENSION_MATERIAL.push_back(CDimensionMaterial);
+	DIMENSION_MATERIAL.push_back(CDimensionMaterial);
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	// Init Audio Resource
 //	static ConstructorHelpers::FObjectFinder<USoundWave> fireworkAudioResource(TEXT("SoundWave'/Game/Sounds/336008__rudmer-rotteveel__whistle-and-explosion-single-firework-cropped.336008__rudmer-rotteveel__whistle-and-explosion-single-firework-cropped'"));
@@ -110,20 +110,29 @@ void AMazeBuild::BeginPlay() {
 	WallMaterials[4] = Wall4Material;
 	UMaterialInstanceDynamic* Wall5Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_5_Param"));
 	WallMaterials[5] = Wall5Material;
+
+	startText = GetWorld()->SpawnActor<ATextRenderActor>(ATextRenderActor::StaticClass(), positionToLocation(START), FRotator(0.f, 0.f, 0.f));
+	startText->GetTextRender()->SetText(START_FTEXT);
+	startText->GetTextRender()->SetTextRenderColor(TERMINATION_COLOR);
+	startText->GetTextRender()->SetHorizontalAlignment(EHTA_Center);
+	endText = GetWorld()->SpawnActor<ATextRenderActor>(ATextRenderActor::StaticClass(), positionToLocation(START), FRotator(0.f, 0.f, 0.f));
+	endText->GetTextRender()->SetText(END_FTEXT);
+	endText->GetTextRender()->SetTextRenderColor(TERMINATION_COLOR);
+	endText->GetTextRender()->SetHorizontalAlignment(EHTA_Center);
 }
 
 /**
  * Creates (replaces) a new Maze with the specified dimensions
  *
- * @param {int} u_size
- * @param {int} v_size
- * @param {int} w_size
+ * @param {int} a_size
+ * @param {int} b_size
+ * @param {int} c_size
  * @param {int} depth
  * @param {int} height
  * @param {int} width
  */
-void AMazeBuild::NewMaze(int u_size, int v_size, int w_size, int depth, int height, int width) {
-	_maze = Maze(u_size, v_size, w_size, depth, height, width);
+void AMazeBuild::NewMaze(int a_size, int b_size, int c_size, int depth, int height, int width) {
+	_maze = Maze(a_size, b_size, c_size, depth, height, width);
 	backtrackGenerator.generate(_maze);
 	_maze.solve();
 }
@@ -137,7 +146,7 @@ void AMazeBuild::NewMaze(int u_size, int v_size, int w_size, int depth, int heig
  */
 UInstancedStaticMeshComponent* AMazeBuild::createWall(Direction dir, Position pos) {
 	char id[100];
-	sprintf(id, "wall_%i_%i_%i_%i_%i_%i_%i", dir, pos.getU(), pos.getV(), pos.getW(), pos.getZ(), pos.getY(), pos.getX());
+	sprintf(id, "wall_%i_%i_%i_%i_%i_%i_%i", dir, pos.getA(), pos.getB(), pos.getC(), pos.getZ(), pos.getY(), pos.getX());
 	UInstancedStaticMeshComponent* WallComp = NewObject<UInstancedStaticMeshComponent>(this, id);
 	FRotator wallRotator = WALL_ROTATOR[dir];
 	WallComp->RegisterComponent();
@@ -151,33 +160,6 @@ UInstancedStaticMeshComponent* AMazeBuild::createWall(Direction dir, Position po
 	WallComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
  	WallComp->SetVisibility(true);
 	return WallComp;
-}
-
-/**
- * Create a termination (start/end display) at the specified Position
- *
- * @param {Position} pos
- * @param {bool} isStart
- */
-void AMazeBuild::Termination(Position pos, bool isStart) {
-	UInstancedStaticMeshComponent* TerminationComp = NewObject<UInstancedStaticMeshComponent>(this, (pos == START) ? "START" : "END");
-	FRotator terminationRotator = NO_ROTATOR;
-	TerminationComp->RegisterComponent();
-	TerminationComp->SetStaticMesh((pos == START) ? StartMeshRef : EndMeshRef);
-	TerminationComp->SetFlags(RF_Transactional);
-	this->AddInstanceComponent(TerminationComp);
-	FVector terminationLocation = positionToLocation(pos);
-	FTransform transform(terminationRotator, terminationLocation, TERMINATION_SCALE);
-	TerminationComp->AddInstance(transform);
-	TerminationComp->SetMaterial(0, (pos == START) ? StartMaterial : EndMaterial);
-	TerminationComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	TerminationComp->SetVisibility(true);
-	if (isStart) {
-		startTermination = TerminationComp;
-	}
-	else {
-		endTermination = TerminationComp;
-	}
 }
 
 /**
@@ -228,9 +210,19 @@ void AMazeBuild::InnerWall(Position pos) {
  * @param {USceneComponent*} letters
  * @param {Direction} newDir
  */
-void AMazeBuild::RotateDimensionLetters(USceneComponent* letters, Direction newDir) {
-	FRotator rotator = DIM_LETTER_ROTATORS[newDir];
-	letters->SetRelativeRotation(rotator);
+void AMazeBuild::RotateDimensionLetters(USceneComponent* letters, Direction newDir, FRotator playerRotator) {
+	letters->SetRelativeRotation(DIM_LETTER_ROTATORS[newDir]);
+	int yaw_index = ((360 + (int)round(playerRotator.Yaw)) % 360) / 90;
+	if (newDir == UP_) {
+		startText->SetActorRotation(TERMINATION_UP_ROTATORS[yaw_index], ETeleportType::None);
+		endText->SetActorRotation(TERMINATION_UP_ROTATORS[yaw_index], ETeleportType::None);
+	} else if (newDir == DOWN_) {
+		startText->SetActorRotation(TERMINATION_DOWN_ROTATORS[yaw_index], ETeleportType::None);
+		endText->SetActorRotation(TERMINATION_DOWN_ROTATORS[yaw_index], ETeleportType::None);
+	} else {
+		startText->SetActorRotation(TERMINATION_ROTATORS[newDir], ETeleportType::None);
+		endText->SetActorRotation(TERMINATION_ROTATORS[newDir], ETeleportType::None);
+	}
 }
 
 /**
@@ -242,7 +234,7 @@ void AMazeBuild::RotateDimensionLetters(USceneComponent* letters, Direction newD
  */
 UInstancedStaticMeshComponent* AMazeBuild::DimensionLetter(Position pos, Direction dir) {
 	char id[100];
-	sprintf(id, "dim_letter_%i_%i_%i_%i_%i_%i_%i", pos.getU(), pos.getV(), pos.getW(), pos.getZ(), pos.getY(), pos.getX(), dir);
+	sprintf(id, "dim_letter_%i_%i_%i_%i_%i_%i_%i", pos.getA(), pos.getB(), pos.getC(), pos.getZ(), pos.getY(), pos.getX(), dir);
 	UInstancedStaticMeshComponent* letter = NewObject<UInstancedStaticMeshComponent>(this, id);
 	letter->RegisterComponent();
 	letter->SetStaticMesh((dir % 2)  == 0 ? PlusMeshRef : MinusMeshRef);
@@ -270,10 +262,10 @@ UInstancedStaticMeshComponent* AMazeBuild::DimensionLetter(Position pos, Directi
 void AMazeBuild::DimensionText(Position pos) {
 	FVector lettersLocation = positionToLocation(pos, FVector::ZeroVector);
 	char id[100];
-	sprintf(id, "dim_letters_%i_%i_%i_%i_%i_%i", pos.getU(), pos.getV(), pos.getW(), pos.getZ(), pos.getY(), pos.getX());
+	sprintf(id, "dim_letters_%i_%i_%i_%i_%i_%i", pos.getA(), pos.getB(), pos.getC(), pos.getZ(), pos.getY(), pos.getX());
 	USceneComponent* letters = NewObject <USceneComponent>(this, id, RF_NoFlags, nullptr, false, nullptr);
 	letters->SetRelativeLocation(lettersLocation);
-	for (int dirLoop = U_PLUS; dirLoop <= W_MINUS; dirLoop++) {
+	for (int dirLoop = A_PLUS; dirLoop <= C_MINUS; dirLoop++) {
 		Direction dir = static_cast<Direction>(dirLoop);
 		UInstancedStaticMeshComponent* letter = DimensionLetter(pos, dir);
 		dimensionLetter[pos.getZ()][pos.getY()][pos.getX()][dir] = letter;
@@ -332,24 +324,25 @@ void AMazeBuild::DisplayMaze() {
 		}
 	}
 
-	int uLoop = selectU;
-	int vLoop = selectV;
-	int wLoop = selectW;
-//	for (int uLoop = 0; uLoop < _maze->getUSize(); uLoop++) {
-//		for (int vLoop = 0; vLoop < _maze->getVSize(); vLoop++) {
-//			for (int wLoop = 0; wLoop < _maze->getWSize(); wLoop++) {
+	int aLoop = selectA;
+	int bLoop = selectB;
+	int cLoop = selectC;
+//	for (int aLoop = 0; aLoop < _maze->getASize(); aLoop++) {
+//		for (int bLoop = 0; bLoop < _maze->getBSize(); bLoop++) {
+//			for (int cLoop = 0; cLoop < _maze->getCSize(); cLoop++) {
 				for (int zLoop = 0; zLoop <= GetMaze().getDepth(); zLoop++) {
 					for (int yLoop = 0; yLoop <= GetMaze().getHeight(); yLoop++) {
 						for (int xLoop = 0; xLoop <= GetMaze().getWidth(); xLoop++) {
-							ProcessCell(Position(uLoop, vLoop, wLoop, zLoop, yLoop, xLoop));
+							ProcessCell(Position(aLoop, bLoop, cLoop, zLoop, yLoop, xLoop));
 						}
 					}
 				}
 //			}
 //		}
 //	}
-	Termination(START, true);
-	Termination(Position(0, 0, 0, GetMaze().getDepth() - 1, GetMaze().getHeight() - 1, GetMaze().getWidth() - 1), false);
+	startText->SetActorLocation(positionToLocation(START));
+	Position END = Position(0, 0, 0, GetMaze().getDepth() - 1, GetMaze().getHeight() - 1, GetMaze().getWidth() - 1);
+	endText->SetActorLocation(positionToLocation(END));
 }
 
 /**
@@ -357,13 +350,13 @@ void AMazeBuild::DisplayMaze() {
  *
  * @param {Direction} newDir
  */
-void AMazeBuild::ChangeDirection(Direction newDir) {
+void AMazeBuild::ChangeDirection(Direction newDir, FRotator playerRotator) {
 	for (int zLoop = 0; zLoop <= GetMaze().getDepth(); zLoop++) {
 		for (int yLoop = 0; yLoop <= GetMaze().getHeight(); yLoop++) {
 			for (int xLoop = 0; xLoop <= GetMaze().getWidth(); xLoop++) {
-				Position pos(selectU, selectV, selectW, zLoop, yLoop, xLoop);
+				Position pos(selectA, selectB, selectC, zLoop, yLoop, xLoop);
 				USceneComponent* letters = dimensionLetters[pos.getZ()][pos.getY()][pos.getX()];
-				RotateDimensionLetters(letters, newDir);
+				RotateDimensionLetters(letters, newDir, playerRotator);
 			}
 		}
 	}
@@ -388,16 +381,16 @@ Position AMazeBuild::MoveDimension(Position pos, Direction dir) {
  * @param {Position} pos
  */
 void AMazeBuild::SetDimension(Position pos) {
-	selectU = pos.getU();
-	selectV = pos.getV();
-	selectW = pos.getW();
+	selectA = pos.getA();
+	selectB = pos.getB();
+	selectC = pos.getC();
 	for (int zLoop = 0; zLoop <= GetMaze().getDepth(); zLoop++) {
 		for (int yLoop = 0; yLoop <= GetMaze().getHeight(); yLoop++) {
 			for (int xLoop = 0; xLoop <= GetMaze().getWidth(); xLoop++) {
 				for (Direction dirLoop : wallDirs) {
 					UInstancedStaticMeshComponent* wall = walls[zLoop][yLoop][xLoop][dirLoop];
 					if (wall != NULL) {
-						if (zLoop < GetMaze().getDepth() && yLoop < GetMaze().getHeight() && xLoop < GetMaze().getWidth() && GetMaze().getPassage(Position(selectU, selectV, selectW, zLoop, yLoop, xLoop), dirLoop)) {
+						if (zLoop < GetMaze().getDepth() && yLoop < GetMaze().getHeight() && xLoop < GetMaze().getWidth() && GetMaze().getPassage(Position(selectA, selectB, selectC, zLoop, yLoop, xLoop), dirLoop)) {
 							wall->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 							wall->SetVisibility(false, true);
 						}
@@ -410,7 +403,7 @@ void AMazeBuild::SetDimension(Position pos) {
 				for (int dirLoop = MIN_VIRTUAL_DIRECTION; dirLoop < MAX_VIRTUAL_DIRECTION + 1; dirLoop++) {
 					Direction dir = static_cast<Direction>(dirLoop);
 					UInstancedStaticMeshComponent* letter = dimensionLetter[zLoop][yLoop][xLoop][dir];
-					if (zLoop < GetMaze().getDepth() && yLoop < GetMaze().getHeight() && xLoop < GetMaze().getWidth() && GetMaze().getPassage(Position(selectU, selectV, selectW, zLoop, yLoop, xLoop), dir)) {
+					if (zLoop < GetMaze().getDepth() && yLoop < GetMaze().getHeight() && xLoop < GetMaze().getWidth() && GetMaze().getPassage(Position(selectA, selectB, selectC, zLoop, yLoop, xLoop), dir)) {
 						letter->SetVisibility(true);
 					}
 					else {
@@ -420,10 +413,10 @@ void AMazeBuild::SetDimension(Position pos) {
 			}
 		}
 	}
-	startTermination->SetVisibility(pos.getU() == 0 && pos.getV() == 0 && pos.getW() == 0);
-	endTermination->SetVisibility(pos.getU() == GetMaze().getEnd().getU() && pos.getV() == GetMaze().getEnd().getV() && pos.getW() == GetMaze().getEnd().getW());
+	startText->SetActorHiddenInGame(!(pos.getA() == 0 && pos.getB() == 0 && pos.getC() == 0));
+	endText->SetActorHiddenInGame(!(pos.getA() == GetMaze().getEnd().getA() && pos.getB() == GetMaze().getEnd().getB() && pos.getC() == GetMaze().getEnd().getC()));
 
-	int dimOffset = pos.getU() + pos.getV() + pos.getW();
+	int dimOffset = pos.getA() + pos.getB() + pos.getC();
 	WallMaterials[0]->SetScalarParameterValue("U_offset", (dimOffset +  0) % 3);
 	WallMaterials[0]->SetScalarParameterValue("V_offset", (dimOffset +  0) % 2);
 	WallMaterials[1]->SetScalarParameterValue("U_offset", (dimOffset +  1) % 3);
@@ -442,10 +435,10 @@ void AMazeBuild::SetDimension(Position pos) {
  * Construct the new Maze.
  *
  */
-void AMazeBuild::startMaze() {
+void AMazeBuild::startMaze(FRotator playerRotator) {
 	DisplayMaze();
 	SetDimension(START);
-	ChangeDirection(EAST);
+	ChangeDirection(EAST, playerRotator);
 }
 
 /**
@@ -470,16 +463,16 @@ FVector AMazeBuild::positionToLocation(Position pos) {
 }
 
 /**
- * Convert a location (u,v,w and Vector for x,y,z) into a Position.
+ * Convert a location (a,b,c and Vector for x,y,z) into a Position.
  *
- * @param {int} u
- * @param {int} v
- * @param {int} w
+ * @param {int} a
+ * @param {int} b
+ * @param {int} c
  * @param {FVector} location
  * @return {Position*} position
  */
-Position AMazeBuild::locationToPosition(int u, int v, int w, FVector location) {
-	return Position(u, v, w, round((location.Z / AMazeBuild::CUBE_ACTUAL_SIZE) - 0.5), round(location.Y / AMazeBuild::CUBE_ACTUAL_SIZE - 0.5), round(-location.X / AMazeBuild::CUBE_ACTUAL_SIZE - 0.5));
+Position AMazeBuild::locationToPosition(int a, int b, int c, FVector location) {
+	return Position(a, b, c, round((location.Z / AMazeBuild::CUBE_ACTUAL_SIZE) - 0.5), round(location.Y / AMazeBuild::CUBE_ACTUAL_SIZE - 0.5), round(-location.X / AMazeBuild::CUBE_ACTUAL_SIZE - 0.5));
 }
 
 /**
@@ -497,7 +490,7 @@ Maze AMazeBuild::GetMaze() {
  */
 void AMazeBuild::changeWall() {
 	WallTextureIndex = (WallTextureIndex + 1) % TEXTURE_COUNT;
-	for (int dirLoop = 0; dirLoop <= WALL_TEXTURE_COUNT; dirLoop++) {
+	for (int dirLoop = 0; dirLoop < WALL_TEXTURE_COUNT; dirLoop++) {
 		WallMaterials[dirLoop]->SetTextureParameterValue(FName("color"), TextureColor[WallTextureIndex]);
 		WallMaterials[dirLoop]->SetTextureParameterValue(FName("normal"), TextureNormal[WallTextureIndex]);
 	}
