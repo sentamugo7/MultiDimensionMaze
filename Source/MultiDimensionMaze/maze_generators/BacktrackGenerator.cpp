@@ -9,7 +9,7 @@ BacktrackGenerator::BacktrackGenerator()
 {
     //////////    set for consistent testing
     //////////srand(1);
-    /////    for (int i = 0; i < 5; i++) rand();
+    /////    for (int i = 0; i < 3; i++) rand();
 }
 
 /**
@@ -79,9 +79,9 @@ std::vector<Direction> BacktrackGenerator::getUnvisitedDirections(MGOptions opti
  * @param {MGOptions} options
  */
 void BacktrackGenerator::backtrack(Maze& maze, MGOptions mgOptions) {
-    int u_size = maze.getUSize();
-    int v_size = maze.getVSize();
-    int w_size = maze.getWSize();
+    int a_size = maze.getASize();
+    int b_size = maze.getBSize();
+    int c_size = maze.getCSize();
     int depth = maze.getDepth();
     int height = maze.getHeight();
     int width = maze.getWidth();
@@ -93,7 +93,7 @@ void BacktrackGenerator::backtrack(Maze& maze, MGOptions mgOptions) {
     // included.
     GridMaskOptions gmOptions = { /*.interior=*/ false, /*.exterior=*/ true };
 
-    GridMask visited = GridMask(u_size, v_size, w_size, depth, height, width, gmOptions);
+    GridMask visited = GridMask(a_size, b_size, c_size, depth, height, width, gmOptions);
 
     Position save_cur(0, 0, 0, 0, 0, 0);
     Position cur(0, 0, 0, 0, 0, 0);
