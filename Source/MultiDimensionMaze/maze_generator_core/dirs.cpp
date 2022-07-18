@@ -16,12 +16,12 @@ dirs::~dirs()
  */
 Direction dirs::opposite(Direction dir) {
     switch (dir) {
-        case U_PLUS: return U_MINUS;
-        case U_MINUS: return U_PLUS;
-        case V_PLUS: return V_MINUS;
-        case V_MINUS: return V_PLUS;
-        case W_PLUS: return W_MINUS;
-        case W_MINUS: return W_PLUS;
+        case A_PLUS: return A_MINUS;
+        case A_MINUS: return A_PLUS;
+        case B_PLUS: return B_MINUS;
+        case B_MINUS: return B_PLUS;
+        case C_PLUS: return C_MINUS;
+        case C_MINUS: return C_PLUS;
         case UP_: return DOWN_;
         case DOWN_: return UP_;
         case NORTH: return SOUTH;
@@ -34,43 +34,43 @@ Direction dirs::opposite(Direction dir) {
 };
 
 /**
- * Returns the u component of the direction vector
+ * Returns the a component of the direction vector
  *
  * @param {Direction} dir
  * @return {integer}
  */
-int dirs::du(Direction dir) {
+int dirs::da(Direction dir) {
     switch (dir) {
-    case U_PLUS: return 1;
-    case U_MINUS: return -1;
+    case A_PLUS: return 1;
+    case A_MINUS: return -1;
     default: return 0;
     }
 };
 
 /**
- * Returns the v component of the direction vector
+ * Returns the b component of the direction vector
  *
  * @param {Direction} dir
  * @return {integer}
  */
-int dirs::dv(Direction dir) {
+int dirs::db(Direction dir) {
     switch (dir) {
-    case V_PLUS: return 1;
-    case V_MINUS: return -1;
+    case B_PLUS: return 1;
+    case B_MINUS: return -1;
     default: return 0;
     }
 };
 
 /**
- * Returns the w component of the direction vector
+ * Returns the c component of the direction vector
  *
  * @param {Direction} dir
  * @return {integer}
  */
-int dirs::dw(Direction dir) {
+int dirs::dc(Direction dir) {
     switch (dir) {
-    case W_PLUS: return 1;
-    case W_MINUS: return -1;
+    case C_PLUS: return 1;
+    case C_MINUS: return -1;
     default: return 0;
     }
 };

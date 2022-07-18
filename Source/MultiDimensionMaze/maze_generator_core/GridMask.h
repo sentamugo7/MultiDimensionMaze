@@ -13,12 +13,12 @@ struct GridMaskOptions { bool interior; bool exterior; };
 class MULTIDIMENSIONMAZE_API GridMask
 {
 public:
-	GridMask(int u_size, int v_size, int w_size, int depth, int height, int width, GridMaskOptions options);
+	GridMask(int a_size, int b_size, int c_size, int depth, int height, int width, GridMaskOptions options);
 	~GridMask();
 
-    int u_size();
-    int v_size();
-    int w_size();
+    int a_size();
+    int b_size();
+    int c_size();
     int depth();
     int height();
     int width();
@@ -26,9 +26,9 @@ public:
     void set(Position pos, bool value);
  
 private:
-    int _u_size;
-    int _v_size;
-    int _w_size;
+    int _a_size;
+    int _b_size;
+    int _c_size;
     int _depth;
     int _height;
     int _width;

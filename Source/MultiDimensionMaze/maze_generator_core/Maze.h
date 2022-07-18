@@ -18,11 +18,11 @@ class MULTIDIMENSIONMAZE_API Maze
 {
 public:
 	Maze();
-	Maze(int u_size, int v_size, int w_size, int depth, int height, int width);
+	Maze(int a_size, int b_size, int c_size, int depth, int height, int width);
 	~Maze();
-	int getUSize();
-	int getVSize();
-	int getWSize();
+	int getASize();
+	int getBSize();
+	int getCSize();
 	int getDepth();
 	int getHeight();
 	int getWidth();
@@ -35,12 +35,12 @@ public:
 	void solve();
 	int solutionCount();
 	int basisCount();
-
+	Direction getLastSolution();
 
 private:
-	int _u_size;
-	int _v_size;
-	int _w_size;
+	int _a_size;
+	int _b_size;
+	int _c_size;
 	int _depth;
 	int _height;
 	int _width;

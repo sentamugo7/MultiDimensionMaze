@@ -8,33 +8,33 @@ Maze::Maze() : Maze(0, 0, 0, 0, 0, 0) {}
  * The maze is initialized with each cell having no passages.
  *
  * @constructor
- * @param {integer} u_size
- * @param {integer} v_size
- * @param {integer} w_size
+ * @param {integer} a_size
+ * @param {integer} b_size
+ * @param {integer} c_size
  * @param {integer} depth
  * @param {integer} height
  * @param {integer} width
  */
-Maze::Maze(int u_size, int v_size, int w_size, int depth, int height, int width) {
-    _u_size = u_size;
-    _v_size = v_size;
-    _w_size = w_size;
+Maze::Maze(int a_size, int b_size, int c_size, int depth, int height, int width) {
+    _a_size = a_size;
+    _b_size = b_size;
+    _c_size = c_size;
     _depth = depth;
     _height = height;
     _width = width;
 
     cell_grid.clear();
-    cell_grid.resize(getUSize());
-    for (int u_loop = 0; u_loop < getUSize(); u_loop++) {
-        cell_grid[u_loop].resize(getVSize());
-        for (int v_loop = 0; v_loop < getVSize(); v_loop++) {
-            cell_grid[u_loop][v_loop].resize(getWSize());
-            for (int w_loop = 0; w_loop < getWSize(); w_loop++) {
-                cell_grid[u_loop][v_loop][w_loop].resize(getDepth());
+    cell_grid.resize(getASize());
+    for (int a_loop = 0; a_loop < getASize(); a_loop++) {
+        cell_grid[a_loop].resize(getBSize());
+        for (int b_loop = 0; b_loop < getBSize(); b_loop++) {
+            cell_grid[a_loop][b_loop].resize(getCSize());
+            for (int c_loop = 0; c_loop < getCSize(); c_loop++) {
+                cell_grid[a_loop][b_loop][c_loop].resize(getDepth());
                 for (int z_loop = 0; z_loop < getDepth(); z_loop++) {
-                    cell_grid[u_loop][v_loop][w_loop][z_loop].resize(getHeight());
+                    cell_grid[a_loop][b_loop][c_loop][z_loop].resize(getHeight());
                     for (int y_loop = 0; y_loop < getHeight(); y_loop++) {
-                        cell_grid[u_loop][v_loop][w_loop][z_loop][y_loop].resize(getWidth());
+                        cell_grid[a_loop][b_loop][c_loop][z_loop][y_loop].resize(getWidth());
                     }
                 }
             }
@@ -46,29 +46,29 @@ Maze::~Maze()
 {
 }
 /**
- * The u_size of the Maze
+ * The a_size of the Maze
  *
  * @return {integer}
  */
 
-int Maze::getUSize() {
-    return _u_size;
+int Maze::getASize() {
+    return _a_size;
 }
 /**
- * The v_size of the Maze
+ * The b_size of the Maze
  *
  * @return {integer}
  */
-int Maze::getVSize() {
-    return _v_size;
+int Maze::getBSize() {
+    return _b_size;
 }
 /**
- * The w_size of the Maze
+ * The c_size of the Maze
  *
  * @return {integer}
  */
-int Maze::getWSize() {
-    return _w_size;
+int Maze::getCSize() {
+    return _c_size;
 }
 /**
  * The depth of the Maze
@@ -101,13 +101,13 @@ int Maze::getWidth() {
  * @return {integer}
  */
 int Maze::getDimensionCount() {
-    if (getUSize() > 1) {
+    if (getASize() > 1) {
         return 6;
     }
-    else if (getVSize() > 1) {
+    else if (getBSize() > 1) {
         return 5;
     }
-    else if (getWSize() > 1) {
+    else if (getCSize() > 1) {
         return 4;
     }
     else if (getDepth() > 1) {
@@ -119,7 +119,7 @@ int Maze::getDimensionCount() {
 }
 
 bool Maze::isPosInMaze(Position pos) {
-    if (pos.getU() < 0 || pos.getU() >= getUSize() || pos.getV() < 0 || pos.getV() >= getVSize() || pos.getW() < 0 || pos.getW() >= getWSize() || pos.getZ() < 0 || pos.getZ() >= getDepth() || pos.getY() < 0 || pos.getY() >= getHeight() || pos.getX() < 0 || pos.getX() >= getWidth()) {
+    if (pos.getA() < 0 || pos.getA() >= getASize() || pos.getB() < 0 || pos.getB() >= getBSize() || pos.getC() < 0 || pos.getC() >= getCSize() || pos.getZ() < 0 || pos.getZ() >= getDepth() || pos.getY() < 0 || pos.getY() >= getHeight() || pos.getX() < 0 || pos.getX() >= getWidth()) {
         return false;
     }
     return true;
@@ -137,7 +137,7 @@ bool Maze::getPassage(Position pos, Direction dir) {
     if (!isPosInMaze(pos)) {
         return false;
     }
-    return cell_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()][pos.getX()].is_open(dir);
+    return cell_grid[pos.getA()][pos.getB()][pos.getC()][pos.getZ()][pos.getY()][pos.getX()].is_open(dir);
 };
 
 /**
@@ -153,11 +153,11 @@ void Maze::setPassage(Position pos, Direction dir, bool value) {
     if (!isPosInMaze(pos)) {
         return;
     }
-    cell_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()][pos.getX()].set_open(dir, value);
+    cell_grid[pos.getA()][pos.getB()][pos.getC()][pos.getZ()][pos.getY()][pos.getX()].set_open(dir, value);
     if (!isPosInMaze(pos.neighbor(dir))) {
         return;
     }
-    cell_grid[pos.getU() + dirs::du(dir)][pos.getV() + dirs::dv(dir)][pos.getW() + dirs::dw(dir)][pos.getZ() + dirs::dz(dir)][pos.getY() + dirs::dy(dir)][pos.getX() + dirs::dx(dir)].set_open(dirs::opposite(dir), value);
+    cell_grid[pos.getA() + dirs::da(dir)][pos.getB() + dirs::db(dir)][pos.getC() + dirs::dc(dir)][pos.getZ() + dirs::dz(dir)][pos.getY() + dirs::dy(dir)][pos.getX() + dirs::dx(dir)].set_open(dirs::opposite(dir), value);
 };
 
 /**
@@ -166,7 +166,7 @@ void Maze::setPassage(Position pos, Direction dir, bool value) {
  * @return {Position}
  */
 Position Maze::getEnd() {
-    return Position(getUSize() - 1, getVSize() - 1, getWSize() - 1, getDepth() - 1, getHeight() - 1, getWidth() - 1);
+    return Position(getASize() - 1, getBSize() - 1, getCSize() - 1, getDepth() - 1, getHeight() - 1, getWidth() - 1);
 }
 
 /**
@@ -179,7 +179,7 @@ Cell* Maze::getCellAt(Position pos) {
     if (!isPosInMaze(pos)) {
         return NULL;
     }
-    return &cell_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()][pos.getX()];
+    return &cell_grid[pos.getA()][pos.getB()][pos.getC()][pos.getZ()][pos.getY()][pos.getX()];
 }
 
 /**
@@ -237,6 +237,15 @@ int Maze::solutionCount() {
 }
 
 int Maze::basisCount() {
-    return _u_size + _v_size + _w_size + _depth + _height + _width;
+    return _a_size + _b_size + _c_size + _depth + _height + _width;
 }
 
+Direction Maze::getLastSolution() {
+    Direction lastSolution = NONE;
+    Position posLoop = START;
+    while (!(posLoop == getEnd())) {
+        lastSolution = getCellAt(posLoop)->getSolution();
+        posLoop = posLoop.neighbor(getCellAt(posLoop)->getSolution());
+    }
+    return lastSolution;
+}

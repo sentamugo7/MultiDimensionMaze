@@ -4,17 +4,17 @@
  * Position is a six dimensional location - scalar at each dimension
  *
  * @constructor
- * @param {int} u
- * @param {int} v
- * @param {int} w
+ * @param {int} a
+ * @param {int} b
+ * @param {int} c
  * @param {int} z
  * @param {int} y
  * @param {int} x
  */
-Position::Position(int u, int v, int w, int z, int y, int x) {
-	_u = u;
-	_v = v;
-	_w = w;
+Position::Position(int a, int b, int c, int z, int y, int x) {
+	_a = a;
+	_b = b;
+	_c = c;
 	_z = z;
 	_y = y;
 	_x = x;
@@ -26,9 +26,9 @@ Position::Position(int u, int v, int w, int z, int y, int x) {
  * @constructor
  */
 Position::Position() {
-	_u = 0;
-	_v = 0;
-	_w = 0;
+	_a = 0;
+	_b = 0;
+	_c = 0;
 	_z = 0;
 	_y = 0;
 	_x = 0;
@@ -43,30 +43,30 @@ Position::~Position()
 }
 
 /**
- * Returns u dimension value
+ * Returns a dimension value
  *
  * @return {int}
  */
-int Position::getU() {
-	return _u;
+int Position::getA() {
+	return _a;
 }
 
 /**
- * Returns v dimension value
+ * Returns b dimension value
  *
  * @return {int}
  */
-int Position::getV() {
-	return _v;
+int Position::getB() {
+	return _b;
 }
 
 /**
- * Returns w dimension value
+ * Returns c dimension value
  *
  * @return {int}
  */
-int Position::getW() {
-	return _w;
+int Position::getC() {
+	return _c;
 }
 
 /**
@@ -103,7 +103,7 @@ int Position::getX() {
  * @return {Position}
  */
 Position Position::neighbor(Direction dir) {
-	return Position(_u + dirs::du(dir), _v + dirs::dv(dir), _w + dirs::dw(dir), _z + dirs::dz(dir), _y + dirs::dy(dir), _x + dirs::dx(dir));
+	return Position(_a + dirs::da(dir), _b + dirs::db(dir), _c + dirs::dc(dir), _z + dirs::dz(dir), _y + dirs::dy(dir), _x + dirs::dx(dir));
 }
 
 /**
@@ -112,5 +112,5 @@ Position Position::neighbor(Direction dir) {
  * @return {Position}
  */
 Position Position::clone() {
-	return Position(getU(), getV(), getW(), getZ(), getY(), getX());
+	return Position(getA(), getB(), getC(), getZ(), getY(), getX());
 }

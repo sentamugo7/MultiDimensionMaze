@@ -7,33 +7,33 @@
  * @param {integer} width
  * @param {integer} height
  * @param {integer} depth
- * @param {integer} u_size
- * @param {integer} v_size
- * @param {integer} w_size
+ * @param {integer} a_size
+ * @param {integer} b_size
+ * @param {integer} c_size
  * @param {GridMaskOptions} options
  */
-GridMask::GridMask(int u_size, int v_size, int w_size, int depth, int height, int width, GridMaskOptions options) {
-    _u_size = u_size;
-    _v_size = v_size;
-    _w_size = w_size;
+GridMask::GridMask(int a_size, int b_size, int c_size, int depth, int height, int width, GridMaskOptions options) {
+    _a_size = a_size;
+    _b_size = b_size;
+    _c_size = c_size;
     _depth = depth;
     _height = height;
     _width = width;
     _interior = options.interior;
     _exterior = options.exterior;
-    bool_grid.resize(_u_size);
-    for (int u_loop = 0; u_loop < _u_size; u_loop++) {
-        bool_grid[u_loop].resize(_v_size);
-        for (int v_loop = 0; v_loop < _v_size; v_loop++) {
-            bool_grid[u_loop][v_loop].resize(_w_size);
-            for (int w_loop = 0; w_loop < _w_size; w_loop++) {
-                bool_grid[u_loop][v_loop][w_loop].resize(_depth);
+    bool_grid.resize(_a_size);
+    for (int a_loop = 0; a_loop < _a_size; a_loop++) {
+        bool_grid[a_loop].resize(_b_size);
+        for (int b_loop = 0; b_loop < _b_size; b_loop++) {
+            bool_grid[a_loop][b_loop].resize(_c_size);
+            for (int c_loop = 0; c_loop < _c_size; c_loop++) {
+                bool_grid[a_loop][b_loop][c_loop].resize(_depth);
                 for (int z_loop = 0; z_loop < _depth; z_loop++) {
-                    bool_grid[u_loop][v_loop][w_loop][z_loop].resize(_height);
+                    bool_grid[a_loop][b_loop][c_loop][z_loop].resize(_height);
                     for (int y_loop = 0; y_loop < _height; y_loop++) {
-                        bool_grid[u_loop][v_loop][w_loop][z_loop][y_loop].resize(_width);
+                        bool_grid[a_loop][b_loop][c_loop][z_loop][y_loop].resize(_width);
                         for (int x_loop = 0; x_loop < _width; x_loop++) {
-                            bool_grid[u_loop][v_loop][w_loop][z_loop][y_loop][x_loop] = _interior;
+                            bool_grid[a_loop][b_loop][c_loop][z_loop][y_loop][x_loop] = _interior;
                         }
                     }
                 }
@@ -47,30 +47,30 @@ GridMask::~GridMask()
 }
 
 /**
- * The u_size of the GridMask
+ * The a_size of the GridMask
  *
  * @return {integer}
  */
-int GridMask::u_size() {
-    return _u_size;
+int GridMask::a_size() {
+    return _a_size;
 };
 
 /**
- * The v_size of the GridMask
+ * The b_size of the GridMask
  *
  * @return {integer}
  */
-int GridMask::v_size() {
-    return _v_size;
+int GridMask::b_size() {
+    return _b_size;
 };
 
 /**
- * The w_size of the GridMask
+ * The c_size of the GridMask
  *
  * @return {integer}
  */
-int GridMask::w_size() {
-    return _w_size;
+int GridMask::c_size() {
+    return _c_size;
 };
 
 /**
@@ -107,10 +107,10 @@ int GridMask::width() {
  * @return {bool}
  */
 bool GridMask::get(Position pos) {
-    if (pos.getU() < 0 || pos.getU() >= _u_size || pos.getV() < 0 || pos.getV() >= _v_size || pos.getW() < 0 || pos.getW() >= _w_size || pos.getZ() < 0 || pos.getZ() >= _depth || pos.getY() < 0 || pos.getY() >= _height || pos.getX() < 0 || pos.getX() >= _width) {
+    if (pos.getA() < 0 || pos.getA() >= _a_size || pos.getB() < 0 || pos.getB() >= _b_size || pos.getC() < 0 || pos.getC() >= _c_size || pos.getZ() < 0 || pos.getZ() >= _depth || pos.getY() < 0 || pos.getY() >= _height || pos.getX() < 0 || pos.getX() >= _width) {
         return _exterior;
     }
-    return bool_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()][pos.getX()];
+    return bool_grid[pos.getA()][pos.getB()][pos.getC()][pos.getZ()][pos.getY()][pos.getX()];
 };
 
 /**
@@ -121,12 +121,12 @@ bool GridMask::get(Position pos) {
  * @param {bool} [value=true]
  */
 void GridMask::set(Position pos, bool value) {
-    if (pos.getU() < 0 || pos.getU() >= _u_size || pos.getV() < 0 || pos.getV() >= _v_size || pos.getW() < 0 || pos.getW() >= _w_size || pos.getZ() < 0 || pos.getZ() >= _depth || pos.getY() < 0 || pos.getY() >= _height || pos.getX() < 0 || pos.getX() >= _width) {
+    if (pos.getA() < 0 || pos.getA() >= _a_size || pos.getB() < 0 || pos.getB() >= _b_size || pos.getC() < 0 || pos.getC() >= _c_size || pos.getZ() < 0 || pos.getZ() >= _depth || pos.getY() < 0 || pos.getY() >= _height || pos.getX() < 0 || pos.getX() >= _width) {
         return;
     }
-    if (pos.getU() >= bool_grid.size() || pos.getV() >= bool_grid[pos.getU()].size() || pos.getW() >= bool_grid[pos.getU()][pos.getV()].size() || pos.getZ() >= bool_grid[pos.getU()][pos.getV()][pos.getW()].size() || pos.getY() >= bool_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()].size() || pos.getX() >= bool_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()].size()) {
+    if (pos.getA() >= bool_grid.size() || pos.getB() >= bool_grid[pos.getA()].size() || pos.getC() >= bool_grid[pos.getA()][pos.getB()].size() || pos.getZ() >= bool_grid[pos.getA()][pos.getB()][pos.getC()].size() || pos.getY() >= bool_grid[pos.getA()][pos.getB()][pos.getC()][pos.getZ()].size() || pos.getX() >= bool_grid[pos.getA()][pos.getB()][pos.getC()][pos.getZ()][pos.getY()].size()) {
         return;
     }
 
-   bool_grid[pos.getU()][pos.getV()][pos.getW()][pos.getZ()][pos.getY()][pos.getX()] = value;
+   bool_grid[pos.getA()][pos.getB()][pos.getC()][pos.getZ()][pos.getY()][pos.getX()] = value;
 };
