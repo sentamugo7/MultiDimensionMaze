@@ -1,8 +1,7 @@
 # MultiDimensionalMaze
 This is a (up to) six dimensional maze. There are three physical dimensions - x (cyan), y (magenta), z (yellow), and three virtual dimensions - a (red), b (green), c (blue).
 You start out at the Begin Cell (1 in each dimension), and your goal is to reach the End Cell (max of each dimension).  
-To turn left <img src="icons/left_no.svg" width="20" height="20">, right <img src="icons/right_no.svg" width="20" height="20">, up <img src="icons/up_no.svg" width="20" height="20">, down <img src="icons/down_no.svg" width="20" height="20">, reverse <img src="icons/reverse_no.svg" width="20" height="20">, or go forward <img src="icons/forward_no.svg" width="20" height="20">, click on that icon on the right. The icon is white if there is a path in that direction,  
-otherwise black. 
+To turn left <img src="icons/left_no.svg" width="20" height="20">, right <img src="icons/right_no.svg" width="20" height="20">, up <img src="icons/up_no.svg" width="20" height="20">, down <img src="icons/down_no.svg" width="20" height="20">, reverse <img src="icons/reverse_no.svg" width="20" height="20">, or go forward <img src="icons/forward_no.svg" width="20" height="20">, click on that icon on the right. The icon is white if there is a path in that direction, otherwise black. 
 If there is a path in a virtual dimension, there will be a plus and/or minus sign in front of you in the color of that dimension. To move in that dimension, move to the +/- sign in front of you, then click on the +/- sign in the upper right.  
 To get a hint, click on the <img src="icons/hint_blank_neg.svg" width="20" height="20"> icon, the hint will appear in the same place inside a circle. Click the icon again to turn off hints.  
 The dimensions icon in the upper right <img src="icons/dimensions_neg.svg" width="20" height="20"> will show the colored orientation, you can click on this icon to change the walls.  
