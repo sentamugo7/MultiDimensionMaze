@@ -204,12 +204,12 @@ private:
 	static FRotator INIT_PLAYER_ROTATION;
 	static FVector INIT_PLAYER_FORWARD;
 	static FString MAIN_LEVEL_NAME;
-	const static int DEMO_SEED = 28943;
-	const static int MIN_DEMO_COUNT = 10;
-	const static int MAX_DEMO_COUNT = 20;
-	const static int TUTORIAL_SEED = 13166;
-	const static int MIN_TUTORIAL_COUNT = 10;
-	const static int MAX_TUTORIAL_COUNT = 20;
+	const static int DEMO_SEED = 10000;
+	const static int MIN_DEMO_COUNT = 8;
+	const static int MAX_DEMO_COUNT = 12;
+	const static int TUTORIAL_SEED = 20000;
+	const static int MIN_TUTORIAL_COUNT = 8;
+	const static int MAX_TUTORIAL_COUNT = 12;
 
 	static AMazeBuild* _mazeBuild;
 	static USkyLightComponent* _skyLightComponent;
