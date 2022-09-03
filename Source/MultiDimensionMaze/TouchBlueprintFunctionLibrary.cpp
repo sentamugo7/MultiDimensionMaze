@@ -32,12 +32,21 @@ int UTouchBlueprintFunctionLibrary::_width = INIT_X_DIMENSION;
 int UTouchBlueprintFunctionLibrary::_a_size = INIT_A_DIMENSION;
 int UTouchBlueprintFunctionLibrary::_b_size = INIT_B_DIMENSION;
 int UTouchBlueprintFunctionLibrary::_c_size = INIT_C_DIMENSION;
+int UTouchBlueprintFunctionLibrary::_difficulty = 0;
 int UTouchBlueprintFunctionLibrary::_save_depth;
 int UTouchBlueprintFunctionLibrary::_save_height;
 int UTouchBlueprintFunctionLibrary::_save_width;
 int UTouchBlueprintFunctionLibrary::_save_a_size;
 int UTouchBlueprintFunctionLibrary::_save_b_size;
 int UTouchBlueprintFunctionLibrary::_save_c_size;
+int UTouchBlueprintFunctionLibrary::_save_difficulty = 0;
+int UTouchBlueprintFunctionLibrary::_saveSettingsWidth = INIT_X_DIMENSION;
+int UTouchBlueprintFunctionLibrary::_saveSettingsHeight = INIT_Y_DIMENSION;
+int UTouchBlueprintFunctionLibrary::_saveSettingsDepth = INIT_Z_DIMENSION;
+int UTouchBlueprintFunctionLibrary::_saveSettingsADimension = INIT_A_DIMENSION;
+int UTouchBlueprintFunctionLibrary::_saveSettingsBDimension = INIT_B_DIMENSION;
+int UTouchBlueprintFunctionLibrary::_saveSettingsCDimension = INIT_C_DIMENSION;
+
 float UTouchBlueprintFunctionLibrary::_cellSize = DEFAULT_CELL_SIZE;
 bool UTouchBlueprintFunctionLibrary::_is_tutorial = false;
 bool UTouchBlueprintFunctionLibrary::_is_demo = false;
@@ -589,22 +598,34 @@ float UTouchBlueprintFunctionLibrary::getPlayerRotationRoll() {
  */
 void UTouchBlueprintFunctionLibrary::initMaze() {
     _initializing = true;
+    int counter = 0;
     if (_is_demo) {
         srand(DEMO_SEED);
         do {
             _mazeBuild->NewMaze(_a_size, _b_size, _c_size, _depth, _height, _width);
-        } while (_mazeBuild->GetMaze().solutionCount() < MIN_DEMO_COUNT || _mazeBuild->GetMaze().solutionCount() > MAX_DEMO_COUNT || _mazeBuild->GetMaze().getLastSolution() < UP_ || _mazeBuild->GetMaze().getLastSolution() > WEST);
+            counter++;
+        } while ((_mazeBuild->GetMaze().solutionCount() < MIN_DEMO_COUNT || _mazeBuild->GetMaze().solutionCount() > MAX_DEMO_COUNT || _mazeBuild->GetMaze().getLastSolution() < UP_ || _mazeBuild->GetMaze().getLastSolution() > WEST) && (counter < INIT_MAZE_MAX));
     }
     else if (_is_tutorial) {
         srand(TUTORIAL_SEED);
         do {
             _mazeBuild->NewMaze(_a_size, _b_size, _c_size, _depth, _height, _width);
-        } while (_mazeBuild->GetMaze().solutionCount() < MIN_TUTORIAL_COUNT || _mazeBuild->GetMaze().solutionCount() > MAX_TUTORIAL_COUNT || _mazeBuild->GetMaze().getLastSolution() < UP_ || _mazeBuild->GetMaze().getLastSolution() > WEST);
+            counter++;
+        } while ((_mazeBuild->GetMaze().solutionCount() < MIN_TUTORIAL_COUNT || _mazeBuild->GetMaze().solutionCount() > MAX_TUTORIAL_COUNT || _mazeBuild->GetMaze().getLastSolution() < UP_ || _mazeBuild->GetMaze().getLastSolution() > WEST) && (counter < INIT_MAZE_MAX));
     } else {
         srand(time(NULL));
         srand(rand());
         srand(rand());
-        _mazeBuild->NewMaze(_a_size, _b_size, _c_size, _depth, _height, _width);
+        double difficultyCalc;
+        do {
+            _mazeBuild->NewMaze(_a_size, _b_size, _c_size, _depth, _height, _width);
+            counter++;
+            difficultyCalc = (double)_mazeBuild->GetMaze().solutionCount() / (double)_mazeBuild->GetMaze().basisCount();
+/////UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::initMaze 1 solutionCount() = %i, basisCount() = %i, difficultyCalc = %f, _difficulty = %i, MIN_DIFFICULTY[_difficulty]=%f, MAX_DIFFICULTY[_difficulty] = %f, counter = %i"), _mazeBuild->GetMaze().solutionCount(), _mazeBuild->GetMaze().basisCount(), difficultyCalc, _difficulty, MIN_DIFFICULTY[_difficulty], MAX_DIFFICULTY[_difficulty], counter);
+        } while ((difficultyCalc <= MIN_DIFFICULTY[_difficulty] - DIFFICULTY_BUFFER || difficultyCalc >= MAX_DIFFICULTY[_difficulty] + DIFFICULTY_BUFFER) && (counter < INIT_MAZE_MAX));
+    }
+    if (counter >=INIT_MAZE_MAX) {
+        UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::initMaze 2 counter = %i"), counter);
     }
     Maze maze = _mazeBuild->GetMaze();
     _playerRotator = INIT_PLAYER_ROTATION;
@@ -794,6 +815,21 @@ int UTouchBlueprintFunctionLibrary::getZSize() {
     return _depth;
 }
 
+/**
+ * get the selected difficulty (easy, medium, hard, random)
+ *
+ * @return {int}
+ */
+int UTouchBlueprintFunctionLibrary::getDifficulty() {
+    return _difficulty;
+}
+
+/**
+ * get maze size in the specified dimension
+ *
+ * @param {int} dimensionIndex
+ * @return {int}
+ */
 int UTouchBlueprintFunctionLibrary::getDimensionSize(int dimensionIndex) {
     switch (dimensionIndex) { 
     case 0:
@@ -813,6 +849,29 @@ int UTouchBlueprintFunctionLibrary::getDimensionSize(int dimensionIndex) {
     }
 }
 
+
+void UTouchBlueprintFunctionLibrary::setDifficultyRange() {
+    double mazeTest[MAZE_TEST_COUNT];
+    srand(time(NULL));
+    srand(rand());
+    srand(rand());
+    double difficultyCalc;
+    for (int mazeLoop = 0; mazeLoop < MAZE_TEST_COUNT; mazeLoop++){
+        _mazeBuild->NewMaze(_a_size, _b_size, _c_size, _depth, _height, _width);
+        difficultyCalc = (double)_mazeBuild->GetMaze().solutionCount() / (double)_mazeBuild->GetMaze().basisCount();
+        mazeTest[mazeLoop] = difficultyCalc;
+/////        UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::setDifficultyRange 1 mazeLoop = %i, difficultyCalc = %f"), mazeLoop, difficultyCalc);
+    }
+    std::sort(std::begin(mazeTest), std::end(mazeTest));
+    int easyMedium = floor((double)MAZE_TEST_COUNT / 12.0);
+    int mediumHard = floor((double)MAZE_TEST_COUNT / 2.0);
+/////    UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::setDifficultyRange 2 easyMedium = %i ,%f, mediumHard = %i, %f"), easyMedium, mazeTest[easyMedium], mediumHard, mazeTest[mediumHard]);
+    MAX_DIFFICULTY[0] = mazeTest[easyMedium];
+    MIN_DIFFICULTY[1] = mazeTest[easyMedium];
+    MAX_DIFFICULTY[1] = mazeTest[mediumHard];
+    MIN_DIFFICULTY[2] = mazeTest[mediumHard];
+}
+
 /**
  * update user settings, dimension size in each dimension
  *
@@ -822,8 +881,9 @@ int UTouchBlueprintFunctionLibrary::getDimensionSize(int dimensionIndex) {
  * @param {int} aSize
  * @param {int} bSize
  * @param {int} cSize
+ * @param {int} difficulty
  */
-void UTouchBlueprintFunctionLibrary::updateSettings(int xSize, int ySize, int zSize, int aSize, int bSize, int cSize) {
+void UTouchBlueprintFunctionLibrary::updateSettings(int xSize, int ySize, int zSize, int aSize, int bSize, int cSize, int difficulty) {
     _initializing = true;
     _width  = xSize;
     _height = ySize;
@@ -831,6 +891,17 @@ void UTouchBlueprintFunctionLibrary::updateSettings(int xSize, int ySize, int zS
     _a_size = aSize;
     _b_size = bSize;
     _c_size = cSize;
+    _difficulty = difficulty;
+    if (xSize != _saveSettingsWidth || ySize != _saveSettingsHeight || zSize != _saveSettingsDepth || aSize != _saveSettingsADimension || bSize != _saveSettingsBDimension || cSize != _saveSettingsCDimension) {
+/////UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::updateSettings 1 xSize = %i, _saveSettingsWidth = %i, ySize = %i, _saveSettingsHeight = %i, zSize = %i, _saveSettingsDepth = %i, aSize = %i, _saveSettingsADimension = %i, bSize = %i, _saveSettingsBDimension = %i, cSize = %i, _saveSettingsCDimension = %i"), xSize, _saveSettingsWidth, ySize, _saveSettingsHeight, zSize, _saveSettingsDepth, aSize, _saveSettingsADimension, bSize, _saveSettingsBDimension, cSize, _saveSettingsCDimension);
+        setDifficultyRange();
+        _saveSettingsWidth = xSize;
+        _saveSettingsHeight = ySize;
+        _saveSettingsDepth = zSize;
+        _saveSettingsADimension = aSize;
+        _saveSettingsBDimension = bSize;
+        _saveSettingsCDimension = cSize;
+    }
     initMaze();
     _initializing = false;
 }
@@ -840,7 +911,7 @@ void UTouchBlueprintFunctionLibrary::updateSettings(int xSize, int ySize, int zS
  *
  */
 void UTouchBlueprintFunctionLibrary::initTutorialSettings() {
-    updateSettings(INIT_X_DIMENSION, INIT_Y_DIMENSION, INIT_Z_DIMENSION, INIT_A_DIMENSION, INIT_B_DIMENSION, INIT_C_DIMENSION);
+    updateSettings(INIT_X_DIMENSION, INIT_Y_DIMENSION, INIT_Z_DIMENSION, INIT_A_DIMENSION, INIT_B_DIMENSION, INIT_C_DIMENSION, 0);
 }
 
 /**
@@ -975,10 +1046,11 @@ void UTouchBlueprintFunctionLibrary::setTutorial(bool tutorial) {
         _save_depth = _depth;
         _save_height = _height;
         _save_width = _width;
-        updateSettings(INIT_X_DIMENSION, INIT_Y_DIMENSION, INIT_Z_DIMENSION, INIT_A_DIMENSION, INIT_B_DIMENSION, INIT_C_DIMENSION);
+        _save_difficulty = _difficulty;
+        updateSettings(INIT_X_DIMENSION, INIT_Y_DIMENSION, INIT_Z_DIMENSION, INIT_A_DIMENSION, INIT_B_DIMENSION, INIT_C_DIMENSION, 0);
     }
     else {
-        updateSettings(_save_width, _save_height, _save_depth, _save_a_size, _save_b_size, _save_c_size);
+        updateSettings(_save_width, _save_height, _save_depth, _save_a_size, _save_b_size, _save_c_size, _save_difficulty);
     }
 }
 
@@ -1005,10 +1077,11 @@ void UTouchBlueprintFunctionLibrary::setDemo(bool demo) {
         _save_depth = _depth;
         _save_height = _height;
         _save_width = _width;
-        updateSettings(DEMO_X_DIMENSION, DEMO_Y_DIMENSION, DEMO_Z_DIMENSION, DEMO_A_DIMENSION, DEMO_B_DIMENSION, DEMO_C_DIMENSION);
+        _save_difficulty = _difficulty;
+        updateSettings(DEMO_X_DIMENSION, DEMO_Y_DIMENSION, DEMO_Z_DIMENSION, DEMO_A_DIMENSION, DEMO_B_DIMENSION, DEMO_C_DIMENSION, 0);
     }
     else {
-        updateSettings(_save_width, _save_height, _save_depth, _save_a_size, _save_b_size, _save_c_size);
+        updateSettings(_save_width, _save_height, _save_depth, _save_a_size, _save_b_size, _save_c_size, _save_difficulty);
     }
 }
 
@@ -1049,7 +1122,7 @@ void UTouchBlueprintFunctionLibrary::resetState() {
     _is_demo = false;
     _is_tooltip = false;
     if (isTutorialOrDemo) {
-        updateSettings(_save_width, _save_height, _save_depth, _save_a_size, _save_b_size, _save_c_size);
+        updateSettings(_save_width, _save_height, _save_depth, _save_a_size, _save_b_size, _save_c_size, _save_difficulty);
     }
     else {
         initMaze();

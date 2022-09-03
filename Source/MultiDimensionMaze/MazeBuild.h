@@ -27,17 +27,12 @@ static const int MAX_DIMENSION_SIZE = 8; // maximum size of any dimension
 static constexpr double DEFAULT_SIZE = 100.0; // size of UE4 grid
 static constexpr double TEXT_SCALE = 2.0;
 static const FColor NO_COLOR = FColor::Black;
-static const FColor U_COLOR = FColor::Red;
-static const FColor V_COLOR = FColor::Green;
-static const FColor W_COLOR = FColor::Blue;
 static const FColor TERMINATION_COLOR = FColor::Orange;
 
-static const FColor DIMENSION_TEXT_COLOR[12] = { U_COLOR, U_COLOR, V_COLOR, V_COLOR, W_COLOR, W_COLOR, NO_COLOR, NO_COLOR, NO_COLOR, NO_COLOR, NO_COLOR, NO_COLOR };
 static const FText DIMENSION_PLUS = FText::FromString(TEXT("+"));
 static const FText DIMENSION_MINUS = FText::FromString(TEXT("-"));
 static const FText DIMENSION_TEXT[12] = { DIMENSION_PLUS, DIMENSION_MINUS, DIMENSION_PLUS, DIMENSION_MINUS, DIMENSION_PLUS, DIMENSION_MINUS, DIMENSION_PLUS, DIMENSION_MINUS, DIMENSION_PLUS, DIMENSION_MINUS, DIMENSION_PLUS, DIMENSION_MINUS };
 static const char DIMENSION_INCDEC_CHAR[12] = { '+', '-', '+', '-', '+', '-', '+', '-', '+', '-', '+', '-' };
-static const char DIMENSION_CHAR[12] = { 'U', 'U', 'V', 'V', 'W', 'W', 'Z', 'Z', 'Y', 'Y', 'X', 'X' };
 
 static const double DIMENSION_TEXT_X = +0.5;
 static const double DIMENSION_TEXT_Y = +0.5;//+0.75;//+0.9;
@@ -69,7 +64,6 @@ static const int TEXTURE_COUNT = 5;
 
 static FText START_FTEXT = FText::FromString(TEXT("start"));
 static FText END_FTEXT = FText::FromString(TEXT("end"));
-
 
 static const FRotator WALL_ROTATOR[DIRECTION_COUNT] = { NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, X_ROTATOR, X_ROTATOR, Y_ROTATOR, Y_ROTATOR, NO_ROTATOR, NO_ROTATOR };
 

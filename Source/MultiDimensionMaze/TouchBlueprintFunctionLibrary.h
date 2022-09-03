@@ -10,12 +10,17 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GeneralProjectSettings.h"
+#include <algorithm>
 #include <cmath>
 #include <math.h>
 #include <set>
 #include "TouchBlueprintFunctionLibrary.generated.h"
 
 typedef void (*PlayerFunction) (bool isPress);
+
+static double MIN_DIFFICULTY[4] = { 0.0, 1.5, 2.0, 0.0 };
+static double MAX_DIFFICULTY[4] = { 1.5, 2.0, 999999.0, 999999.0 };
+static double DIFFICULTY_BUFFER = 0.0001;
 
 /**
  * 
@@ -134,7 +139,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static int getDimensionSize(int dimensionIndex);
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void updateSettings(int xSize, int ySize, int zSize, int aSize, int bSize, int cSize);
+		static int getDifficulty();
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+		static void updateSettings(int xSize, int ySize, int zSize, int aSize, int bSize, int cSize, int difficulty);
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 		static void initTutorialSettings();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
@@ -174,6 +181,7 @@ public:
 	static void finishPlayerForward();
 	static void startPlayerDimension(Direction direction);
 	static void switchPlayerDimension();
+	static void setDifficultyRange();
 
 	static Direction getPlayerForwardDirection();
 	static void ShowWin();
@@ -188,6 +196,8 @@ private:
 	const static int DEFAULT_DIMENSION_SIZE = 5;
 	constexpr static float DEFAULT_PLAYER_SPEED = 0.2;
 	constexpr static float DEFAULT_CELL_SIZE = 1.0;
+	const static int INIT_MAZE_MAX = 60;
+	const static int MAZE_TEST_COUNT = INIT_MAZE_MAX;
 	const static int INIT_X_DIMENSION = 5;
 	const static int INIT_Y_DIMENSION = 5;
 	const static int INIT_Z_DIMENSION = 1;
@@ -200,6 +210,7 @@ private:
 	const static int DEMO_A_DIMENSION = 1;
 	const static int DEMO_B_DIMENSION = 2;
 	const static int DEMO_C_DIMENSION = 1;
+
 	static Position START;
 	static FRotator INIT_PLAYER_ROTATION;
 	static FVector INIT_PLAYER_FORWARD;
@@ -229,18 +240,26 @@ private:
 
 	static float _animationDuration;
 	constexpr static float WIN_DISPLAY_TIME = 6.0;
+	static int _saveSettingsWidth;
+	static int _saveSettingsHeight;
+	static int _saveSettingsDepth;
+	static int _saveSettingsADimension;
+	static int _saveSettingsBDimension;
+	static int _saveSettingsCDimension;
 	static int _depth;
 	static int _height;
 	static int _width;
 	static int _a_size;
 	static int _b_size;
 	static int _c_size;
+	static int _difficulty;
 	static int _save_depth;
 	static int _save_height;
 	static int _save_width;
 	static int _save_a_size;
 	static int _save_b_size;
 	static int _save_c_size;
+	static int _save_difficulty;
 	static float _cellSize;
 	static bool _initializing;
 	static bool _win_shown;
