@@ -237,7 +237,7 @@ int Maze::solutionCount() {
 }
 
 int Maze::basisCount() {
-    return _a_size + _b_size + _c_size + _depth + _height + _width;
+    return _a_size + _b_size + _c_size + _depth + _height + _width - 6;
 }
 
 Direction Maze::getLastSolution() {
