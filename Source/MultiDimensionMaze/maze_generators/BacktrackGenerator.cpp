@@ -32,8 +32,8 @@ void BacktrackGenerator::generate(Maze& maze) {
  * @param {integer} max
  */
 int BacktrackGenerator::randomInt(MGOptions options, int max) {
-    int rr = rand();
-    return floor(((double)rr / (double)RAND_MAX) * (double)max);
+    return rand() % max;
+    // return floor(((double)rand() / (double)RAND_MAX) * (double)max);
 }
 
 /**
@@ -47,7 +47,7 @@ Direction BacktrackGenerator::randomChoice(MGOptions options, std::vector<Direct
         return array[0];
     int rr = randomInt(options, array.size());
     if (rr >= array.size()) {
-        return Direction::EAST;
+        return array[0];
     }
     return array[rr];
 }
