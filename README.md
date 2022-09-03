@@ -7,8 +7,8 @@ To get a hint, click on the <img src="icons/hint_blank_neg.svg" width="20" heigh
 The dimensions icon in the upper right <img src="icons/dimensions_neg.svg" width="20" height="20"> will show the colored orientation, you can click on this icon to change the walls.  
 Your current position in the maze is displayed in the lower right.  
 You can see the score in the bottom right - the number of moves you have made so far out of the minimum possible moves.  
-To change Preferences, click on the Settings button on the main menu.  
-On the Settings page, you can change the size of each dimension of the maze, drag the slider for that dimension to the new size.  
+To change Settings, click on the Settings button on the main menu.  
+On the Settings page, you can change the size of each dimension of the maze, drag the slider for that dimension to the new size. You can also change the difficulty, and turn sound on and off.  
 To remove a dimension, set the size of that dimension to 1.  
 When you’ve chosen the final maze size, click **`Apply`**.  
 Click **`Cancel`** to reset to the default settings and return to the menu page.
