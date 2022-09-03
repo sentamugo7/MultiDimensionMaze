@@ -64,3 +64,6 @@ magick convert -background none -colorspace sRGB -define png:color-type=6 slider
 magick convert -background none -colorspace sRGB -define png:color-type=6 finger.svg finger.png
 magick convert -background none -colorspace sRGB -define png:color-type=6 menu.svg menu.png
 magick convert -background none -colorspace sRGB -define png:color-type=6 menu_neg.svg menu_neg.png
+
+magick convert -background none -colorspace sRGB -define png:color-type=6 radio_button_on.svg radio_button_on.png
+magick convert -background none -colorspace sRGB -define png:color-type=6 radio_button_off.svg radio_button_off.png
