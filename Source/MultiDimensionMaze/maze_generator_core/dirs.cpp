@@ -16,20 +16,20 @@ dirs::~dirs()
  */
 Direction dirs::opposite(Direction dir) {
     switch (dir) {
-        case A_PLUS: return A_MINUS;
-        case A_MINUS: return A_PLUS;
-        case B_PLUS: return B_MINUS;
-        case B_MINUS: return B_PLUS;
-        case C_PLUS: return C_MINUS;
-        case C_MINUS: return C_PLUS;
-        case UP_: return DOWN_;
-        case DOWN_: return UP_;
-        case NORTH: return SOUTH;
-        case EAST: return WEST;
-        case SOUTH: return NORTH;
-        case WEST: return EAST;
-        case NONE: return NONE;
-        default: return DOWN_; // just to get compile to work, should never happen
+    case A_PLUS: return A_MINUS;
+    case A_MINUS: return A_PLUS;
+    case B_PLUS: return B_MINUS;
+    case B_MINUS: return B_PLUS;
+    case C_PLUS: return C_MINUS;
+    case C_MINUS: return C_PLUS;
+    case UP_: return DOWN_;
+    case DOWN_: return UP_;
+    case NORTH: return SOUTH;
+    case EAST: return WEST;
+    case SOUTH: return NORTH;
+    case WEST: return EAST;
+    case NONE: return NONE;
+    default: return DOWN_; // just to get compile to work, should never happen
     }
 };
 

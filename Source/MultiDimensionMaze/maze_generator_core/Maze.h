@@ -12,7 +12,7 @@
 static const Position START(0, 0, 0, 0, 0, 0);
 
 /**
- * 
+ *
  */
 class MULTIDIMENSIONMAZE_API Maze
 {

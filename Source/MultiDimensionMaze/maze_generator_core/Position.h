@@ -5,7 +5,7 @@
 
 
 /**
- * 
+ *
  */
 class MULTIDIMENSIONMAZE_API Position
 {

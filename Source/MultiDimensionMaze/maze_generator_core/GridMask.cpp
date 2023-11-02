@@ -128,5 +128,5 @@ void GridMask::set(Position pos, bool value) {
         return;
     }
 
-   bool_grid[pos.getA()][pos.getB()][pos.getC()][pos.getZ()][pos.getY()][pos.getX()] = value;
+    bool_grid[pos.getA()][pos.getB()][pos.getC()][pos.getZ()][pos.getY()][pos.getX()] = value;
 };

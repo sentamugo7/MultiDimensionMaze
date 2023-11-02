@@ -8,13 +8,13 @@
 #include "CoreMinimal.h"
 struct GridMaskOptions { bool interior; bool exterior; };
 /**
- * 
+ *
  */
 class MULTIDIMENSIONMAZE_API GridMask
 {
 public:
-	GridMask(int a_size, int b_size, int c_size, int depth, int height, int width, GridMaskOptions options);
-	~GridMask();
+    GridMask(int a_size, int b_size, int c_size, int depth, int height, int width, GridMaskOptions options);
+    ~GridMask();
 
     int a_size();
     int b_size();
@@ -24,7 +24,7 @@ public:
     int width();
     bool get(Position pos);
     void set(Position pos, bool value);
- 
+
 private:
     int _a_size;
     int _b_size;

@@ -7,7 +7,7 @@
 #include "CoreMinimal.h"
 
 /**
- * 
+ *
  */
 class MULTIDIMENSIONMAZE_API Cell
 {

@@ -97,7 +97,7 @@ int Position::getX() {
 }
 
 /**
- * Returns the Position one in the Direction specified 
+ * Returns the Position one in the Direction specified
  *
  * @param {Direction} dir
  * @return {Position}

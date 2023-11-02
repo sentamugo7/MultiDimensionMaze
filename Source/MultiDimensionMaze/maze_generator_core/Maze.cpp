@@ -205,7 +205,7 @@ void Maze::solveAt(Position pos) {
             Position neighborPos = pos.neighbor(dir);
             //if (getCellAt(neighborPos) != NULL && getCellAt(neighborPos)->getSolution() == NONE) {
             if (getCellAt(neighborPos)->getSolution() == NONE) {
-            getCellAt(neighborPos)->setSolution(dirs::opposite(dir));
+                getCellAt(neighborPos)->setSolution(dirs::opposite(dir));
                 noneDirs.push_back(dir);
             }
         }

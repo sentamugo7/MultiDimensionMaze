@@ -11,7 +11,7 @@ enum Direction { A_PLUS, A_MINUS, B_PLUS, B_MINUS, C_PLUS, C_MINUS, UP_ /* z inc
 static const int DIRECTION_COUNT = NONE;
 
 /**
- * 
+ *
  */
 class MULTIDIMENSIONMAZE_API dirs
 {
