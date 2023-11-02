@@ -8,7 +8,8 @@ public class MultiDimensionMazeEditorTarget : TargetRules
 	public MultiDimensionMazeEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.AddRange( new string[] { "MultiDimensionMaze" } );
+		DefaultBuildSettings = BuildSettingsVersion.V4;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
+		ExtraModuleNames.Add("MultiDimensionMaze");
 	}
 }
