@@ -14,7 +14,7 @@
 struct MGOptions { };
 
 /**
- * 
+ *
  */
 class MULTIDIMENSIONMAZE_API BacktrackGenerator
 {
@@ -24,7 +24,7 @@ public:
 	void generate(Maze& maze);
 	int randomInt(MGOptions options, int max);
 	Direction randomChoice(MGOptions options, std::vector<Direction> array);
-    std::vector<Direction> getUnvisitedDirections(MGOptions options, GridMask visited, Position pos);
+	std::vector<Direction> getUnvisitedDirections(MGOptions options, GridMask visited, Position pos);
 	void backtrack(Maze& maze, MGOptions mgOptions);
 private:
 };
