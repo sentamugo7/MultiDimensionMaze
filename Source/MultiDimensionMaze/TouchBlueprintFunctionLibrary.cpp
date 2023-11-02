@@ -1,3 +1,6 @@
+
+
+
 #include "TouchBlueprintFunctionLibrary.h"
 
 /* static variables */
@@ -6,7 +9,7 @@ Position UTouchBlueprintFunctionLibrary::START = Position(0, 0, 0, 0, 0, 0);
 FRotator UTouchBlueprintFunctionLibrary::INIT_PLAYER_ROTATION = FRotator(0, -180, 0);
 FVector UTouchBlueprintFunctionLibrary::INIT_PLAYER_FORWARD = FVector(-1, 0, 0);
 
-AMazeBuild* UTouchBlueprintFunctionLibrary::_mazeBuild = NULL;
+AMazeBuild* UTouchBlueprintFunctionLibrary::_mazeBuild;
 USkyLightComponent* UTouchBlueprintFunctionLibrary::_skyLightComponent = NULL;
 ACharacter* UTouchBlueprintFunctionLibrary::_player;
 FRotator UTouchBlueprintFunctionLibrary::_playerRotator = INIT_PLAYER_ROTATION;
@@ -356,7 +359,7 @@ void UTouchBlueprintFunctionLibrary::clickCMinus() {
  * @return {FString}
  */
 FString UTouchBlueprintFunctionLibrary::getPlayerPositionADisplay() {
-    return _mazeBuild->GetMaze().getASize()== 1 ? "" : FString::Printf(TEXT("a:%i/%i"), _playerPosition.getA() + 1, _mazeBuild->GetMaze().getASize());
+    return _mazeBuild->GetMaze().getASize() == 1 ? "" : FString::Printf(TEXT("a:%i/%i"), _playerPosition.getA() + 1, _mazeBuild->GetMaze().getASize());
 }
 
 /**
@@ -612,7 +615,8 @@ void UTouchBlueprintFunctionLibrary::initMaze() {
             _mazeBuild->NewMaze(_a_size, _b_size, _c_size, _depth, _height, _width);
             counter++;
         } while ((_mazeBuild->GetMaze().solutionCount() < MIN_TUTORIAL_COUNT || _mazeBuild->GetMaze().solutionCount() > MAX_TUTORIAL_COUNT || _mazeBuild->GetMaze().getLastSolution() < UP_ || _mazeBuild->GetMaze().getLastSolution() > WEST) && (counter < INIT_MAZE_MAX));
-    } else {
+    }
+    else {
         srand(time(NULL));
         srand(rand());
         srand(rand());
@@ -621,10 +625,10 @@ void UTouchBlueprintFunctionLibrary::initMaze() {
             _mazeBuild->NewMaze(_a_size, _b_size, _c_size, _depth, _height, _width);
             counter++;
             difficultyCalc = (double)_mazeBuild->GetMaze().solutionCount() / (double)_mazeBuild->GetMaze().basisCount();
-/////UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::initMaze 1 solutionCount() = %i, basisCount() = %i, difficultyCalc = %f, _difficulty = %i, MIN_DIFFICULTY[_difficulty]=%f, MAX_DIFFICULTY[_difficulty] = %f, counter = %i"), _mazeBuild->GetMaze().solutionCount(), _mazeBuild->GetMaze().basisCount(), difficultyCalc, _difficulty, MIN_DIFFICULTY[_difficulty], MAX_DIFFICULTY[_difficulty], counter);
+            /////UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::initMaze 1 solutionCount() = %i, basisCount() = %i, difficultyCalc = %f, _difficulty = %i, MIN_DIFFICULTY[_difficulty]=%f, MAX_DIFFICULTY[_difficulty] = %f, counter = %i"), _mazeBuild->GetMaze().solutionCount(), _mazeBuild->GetMaze().basisCount(), difficultyCalc, _difficulty, MIN_DIFFICULTY[_difficulty], MAX_DIFFICULTY[_difficulty], counter);
         } while ((difficultyCalc <= MIN_DIFFICULTY[_difficulty] - DIFFICULTY_BUFFER || difficultyCalc >= MAX_DIFFICULTY[_difficulty] + DIFFICULTY_BUFFER) && (counter < INIT_MAZE_MAX));
     }
-    if (counter >=INIT_MAZE_MAX) {
+    if (counter >= INIT_MAZE_MAX) {
         UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::initMaze 2 counter = %i"), counter);
     }
     Maze maze = _mazeBuild->GetMaze();
@@ -667,10 +671,10 @@ void UTouchBlueprintFunctionLibrary::setPlayer(ACharacter* player) {
         UE_LOG(LogTemp, Log, TEXT(">>>>>>>> UTouchBlueprintFunctionLibrary::setPlayer FAIL _player == NULL !!!!!"));
         return;
     }
-    _player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-    player->bUseControllerRotationPitch = false;
-    player->bUseControllerRotationRoll = false;
-    player->bUseControllerRotationYaw = false;
+    /////_player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+    _player->bUseControllerRotationPitch = false;
+    _player->bUseControllerRotationRoll = false;
+    _player->bUseControllerRotationYaw = false;
     _playerController = _player->GetController();
     _player->SetActorLocation(_mazeBuild->positionToLocation(_playerPosition));
     _playerController->SetControlRotation(_playerRotator);
@@ -831,7 +835,7 @@ int UTouchBlueprintFunctionLibrary::getDifficulty() {
  * @return {int}
  */
 int UTouchBlueprintFunctionLibrary::getDimensionSize(int dimensionIndex) {
-    switch (dimensionIndex) { 
+    switch (dimensionIndex) {
     case 0:
         return _width;
     case 1:
@@ -856,16 +860,16 @@ void UTouchBlueprintFunctionLibrary::setDifficultyRange() {
     srand(rand());
     srand(rand());
     double difficultyCalc;
-    for (int mazeLoop = 0; mazeLoop < MAZE_TEST_COUNT; mazeLoop++){
+    for (int mazeLoop = 0; mazeLoop < MAZE_TEST_COUNT; mazeLoop++) {
         _mazeBuild->NewMaze(_a_size, _b_size, _c_size, _depth, _height, _width);
         difficultyCalc = (double)_mazeBuild->GetMaze().solutionCount() / (double)_mazeBuild->GetMaze().basisCount();
         mazeTest[mazeLoop] = difficultyCalc;
-/////        UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::setDifficultyRange 1 mazeLoop = %i, difficultyCalc = %f"), mazeLoop, difficultyCalc);
+        /////        UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::setDifficultyRange 1 mazeLoop = %i, difficultyCalc = %f"), mazeLoop, difficultyCalc);
     }
     std::sort(std::begin(mazeTest), std::end(mazeTest));
     int easyMedium = floor((double)MAZE_TEST_COUNT / 12.0);
     int mediumHard = floor((double)MAZE_TEST_COUNT / 2.0);
-/////    UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::setDifficultyRange 2 easyMedium = %i ,%f, mediumHard = %i, %f"), easyMedium, mazeTest[easyMedium], mediumHard, mazeTest[mediumHard]);
+    /////    UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::setDifficultyRange 2 easyMedium = %i ,%f, mediumHard = %i, %f"), easyMedium, mazeTest[easyMedium], mediumHard, mazeTest[mediumHard]);
     MAX_DIFFICULTY[0] = mazeTest[easyMedium];
     MIN_DIFFICULTY[1] = mazeTest[easyMedium];
     MAX_DIFFICULTY[1] = mazeTest[mediumHard];
@@ -885,15 +889,15 @@ void UTouchBlueprintFunctionLibrary::setDifficultyRange() {
  */
 void UTouchBlueprintFunctionLibrary::updateSettings(int xSize, int ySize, int zSize, int aSize, int bSize, int cSize, int difficulty) {
     _initializing = true;
-    _width  = xSize;
+    _width = xSize;
     _height = ySize;
-    _depth  = zSize;
+    _depth = zSize;
     _a_size = aSize;
     _b_size = bSize;
     _c_size = cSize;
     _difficulty = difficulty;
     if (xSize != _saveSettingsWidth || ySize != _saveSettingsHeight || zSize != _saveSettingsDepth || aSize != _saveSettingsADimension || bSize != _saveSettingsBDimension || cSize != _saveSettingsCDimension) {
-/////UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::updateSettings 1 xSize = %i, _saveSettingsWidth = %i, ySize = %i, _saveSettingsHeight = %i, zSize = %i, _saveSettingsDepth = %i, aSize = %i, _saveSettingsADimension = %i, bSize = %i, _saveSettingsBDimension = %i, cSize = %i, _saveSettingsCDimension = %i"), xSize, _saveSettingsWidth, ySize, _saveSettingsHeight, zSize, _saveSettingsDepth, aSize, _saveSettingsADimension, bSize, _saveSettingsBDimension, cSize, _saveSettingsCDimension);
+        /////UE_LOG(LogTemp, Warning, TEXT("UTouchBlueprintFunctionLibrary::updateSettings 1 xSize = %i, _saveSettingsWidth = %i, ySize = %i, _saveSettingsHeight = %i, zSize = %i, _saveSettingsDepth = %i, aSize = %i, _saveSettingsADimension = %i, bSize = %i, _saveSettingsBDimension = %i, cSize = %i, _saveSettingsCDimension = %i"), xSize, _saveSettingsWidth, ySize, _saveSettingsHeight, zSize, _saveSettingsDepth, aSize, _saveSettingsADimension, bSize, _saveSettingsBDimension, cSize, _saveSettingsCDimension);
         setDifficultyRange();
         _saveSettingsWidth = xSize;
         _saveSettingsHeight = ySize;
@@ -939,7 +943,7 @@ void UTouchBlueprintFunctionLibrary::ShowWin() {
     FTimerHandle TimerHandle;
     _mazeBuild->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
         {
-           FinishWin();
+            FinishWin();
         }, WIN_DISPLAY_TIME, false);
 }
 
@@ -985,25 +989,30 @@ void UTouchBlueprintFunctionLibrary::MazeTick(float animationTime) {
         if (oldRotation != newRotation) {
             FRotator tickRotation = oldRotation + animationPercent * (newRotation - oldRotation);
             _playerController->SetControlRotation(tickRotation);
-        } else
-        if (oldPositionXYZ != newPositionXYZ) {
-            FVector tickPositionXYZ = oldPositionXYZ + animationPercent * (newPositionXYZ - oldPositionXYZ);
-            _player->SetActorLocation(_mazeBuild->positionToLocation(Position(), tickPositionXYZ));
-        } else
-        if (dimensionTransitionDirection != NONE) {
-            _mazeBuild->displayDimensionTransition(std::min(1.0, animationPercent * 2.0));
-            if (animationPercent >= 0.5) {
-                switchPlayerDimension();
-            }
-        } else
-        if (isDimensionTransition) {
-            _mazeBuild->displayDimensionTransition(std::min(1.0, (1 - animationPercent) * 2.0));
         }
-    } else {
+        else
+            if (oldPositionXYZ != newPositionXYZ) {
+                FVector tickPositionXYZ = oldPositionXYZ + animationPercent * (newPositionXYZ - oldPositionXYZ);
+                _player->SetActorLocation(_mazeBuild->positionToLocation(Position(), tickPositionXYZ));
+            }
+            else
+                if (dimensionTransitionDirection != NONE) {
+                    _mazeBuild->displayDimensionTransition(std::min(1.0, animationPercent * 2.0));
+                    if (animationPercent >= 0.5) {
+                        switchPlayerDimension();
+                    }
+                }
+                else
+                    if (isDimensionTransition) {
+                        _mazeBuild->displayDimensionTransition(std::min(1.0, (1 - animationPercent) * 2.0));
+                    }
+    }
+    else {
         isDimensionTransition = false;
         if (oldRotation != newRotation) {
             finishRotatePlayer();
-        } else
+        }
+        else
             if (oldPositionXYZ != newPositionXYZ) {
                 finishPlayerForward();
             }
@@ -1038,7 +1047,7 @@ FString UTouchBlueprintFunctionLibrary::getScore() {
  * @param {bool} tutorial
  */
 void UTouchBlueprintFunctionLibrary::setTutorial(bool tutorial) {
-    _is_tutorial  = tutorial;
+    _is_tutorial = tutorial;
     if (_is_tutorial) {
         _save_a_size = _a_size;
         _save_b_size = _b_size;
@@ -1132,17 +1141,29 @@ void UTouchBlueprintFunctionLibrary::resetState() {
 /**
  * return the product version
  *
+ * https://forums.unrealengine.com/t/how-to-get-the-project-version-in-a-blueprint/461882
  * @return {FString}
  */
-FString UTouchBlueprintFunctionLibrary::getProjectVersion() {
-    return GetDefault<UGeneralProjectSettings>()->ProjectVersion;
+
+FString UTouchBlueprintFunctionLibrary::GetAppVersion()
+{
+	FString AppVersion;
+	GConfig->GetString(
+		TEXT("/Script/EngineSettings.GeneralProjectSettings"),
+		TEXT("ProjectVersion"),
+		AppVersion,
+		GGameIni
+	);
+
+	return AppVersion;
 }
+
 /**
  * Move the player to the specified Position
  *
  * @param {Position} pos
  */
 void UTouchBlueprintFunctionLibrary::MovePlayerTo(Position pos) {
-    _player->SetActorLocation(_mazeBuild->positionToLocation(pos));
-    _playerPosition = pos;
+	_player->SetActorLocation(_mazeBuild->positionToLocation(pos));
+	_playerPosition = pos;
 }

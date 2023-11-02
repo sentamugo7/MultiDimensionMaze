@@ -5,9 +5,9 @@ const FVector AMazeBuild::DELTA_WALL[DIRECTION_COUNT] = {
 	FVector::ZeroVector,FVector::ZeroVector,FVector::ZeroVector,FVector::ZeroVector,FVector::ZeroVector,FVector::ZeroVector,
 	FVector(-0.5,  0.0, +0.5),
 	FVector(-0.5,  0.0, -0.5),
-	FVector( 0.0, +0.5, -0.5),
-	FVector( 0.0, -0.5, -0.5),
-	FVector( 0.5,  0.0, -0.5),
+	FVector(0.0, +0.5, -0.5),
+	FVector(0.0, -0.5, -0.5),
+	FVector(0.5,  0.0, -0.5),
 	FVector(-0.5,  0.0, -0.5)
 };
 
@@ -28,7 +28,7 @@ static const FVector TERMINATION_SCALE(AMazeBuild::TERMINATION_DIAMETER, AMazeBu
 static const FVector LETTER_SCALE(TEXT_SCALE, TEXT_SCALE, TEXT_SCALE);
 
 /**
- * AMazeBuild is the Actor in place to build the visual Maze 
+ * AMazeBuild is the Actor in place to build the visual Maze
  *
  * @constructor
  */
@@ -92,12 +92,26 @@ AMazeBuild::AMazeBuild() {
 	TextureColor[4] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
 	PathToLoad = "Texture2D'/Game/Textures/T_Metal_Steel_N.T_Metal_Steel_N'";
 	TextureNormal[4] = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *PathToLoad));
+
+	UMaterialInstanceDynamic* Wall0Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_0_Param"));
+	WallMaterials[0] = Wall0Material;
+	UMaterialInstanceDynamic* Wall1Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_1_Param"));
+	WallMaterials[1] = Wall1Material;
+	UMaterialInstanceDynamic* Wall2Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_2_Param"));
+	WallMaterials[2] = Wall2Material;
+	UMaterialInstanceDynamic* Wall3Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_3_Param"));
+	WallMaterials[3] = Wall3Material;
+	UMaterialInstanceDynamic* Wall4Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_4_Param"));
+	WallMaterials[4] = Wall4Material;
+	UMaterialInstanceDynamic* Wall5Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_5_Param"));
+	WallMaterials[5] = Wall5Material;
 }
 
 // Called when the game starts or when spawned
 void AMazeBuild::BeginPlay() {
 	Super::BeginPlay();
 	// set Material offsets
+/*
 	UMaterialInstanceDynamic* Wall0Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_0_Param"));
 	WallMaterials[0] = Wall0Material;
 	UMaterialInstanceDynamic* Wall1Material = UMaterialInstanceDynamic::Create(WallParam, this, FName("Wall_1_Param"));
@@ -119,6 +133,7 @@ void AMazeBuild::BeginPlay() {
 	endText->GetTextRender()->SetText(END_FTEXT);
 	endText->GetTextRender()->SetTextRenderColor(TERMINATION_COLOR);
 	endText->GetTextRender()->SetHorizontalAlignment(EHTA_Center);
+*/
 }
 
 /**
@@ -158,7 +173,7 @@ UInstancedStaticMeshComponent* AMazeBuild::createWall(Direction dir, Position po
 	WallComp->AddInstance(wallTransform);
 	WallComp->SetMaterial(0, WallMaterials[dir - UP_]);
 	WallComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
- 	WallComp->SetVisibility(true);
+	WallComp->SetVisibility(true);
 	return WallComp;
 }
 
@@ -214,14 +229,16 @@ void AMazeBuild::RotateDimensionLetters(USceneComponent* letters, Direction newD
 	letters->SetRelativeRotation(DIM_LETTER_ROTATORS[newDir]);
 	int yaw_index = ((360 + (int)round(playerRotator.Yaw)) % 360) / 90;
 	if (newDir == UP_) {
-		startText->SetActorRotation(TERMINATION_UP_ROTATORS[yaw_index], ETeleportType::None);
-		endText->SetActorRotation(TERMINATION_UP_ROTATORS[yaw_index], ETeleportType::None);
-	} else if (newDir == DOWN_) {
-		startText->SetActorRotation(TERMINATION_DOWN_ROTATORS[yaw_index], ETeleportType::None);
-		endText->SetActorRotation(TERMINATION_DOWN_ROTATORS[yaw_index], ETeleportType::None);
-	} else {
-		startText->SetActorRotation(TERMINATION_ROTATORS[newDir], ETeleportType::None);
-		endText->SetActorRotation(TERMINATION_ROTATORS[newDir], ETeleportType::None);
+		getStartText()->SetActorRotation(TERMINATION_UP_ROTATORS[yaw_index], ETeleportType::None);
+		getEndText()->SetActorRotation(TERMINATION_UP_ROTATORS[yaw_index], ETeleportType::None);
+	}
+	else if (newDir == DOWN_) {
+		getStartText()->SetActorRotation(TERMINATION_DOWN_ROTATORS[yaw_index], ETeleportType::None);
+		getEndText()->SetActorRotation(TERMINATION_DOWN_ROTATORS[yaw_index], ETeleportType::None);
+	}
+	else {
+		getStartText()->SetActorRotation(TERMINATION_ROTATORS[newDir], ETeleportType::None);
+		getEndText()->SetActorRotation(TERMINATION_ROTATORS[newDir], ETeleportType::None);
 	}
 }
 
@@ -237,7 +254,7 @@ UInstancedStaticMeshComponent* AMazeBuild::DimensionLetter(Position pos, Directi
 	sprintf(id, "dim_letter_%i_%i_%i_%i_%i_%i_%i", pos.getA(), pos.getB(), pos.getC(), pos.getZ(), pos.getY(), pos.getX(), dir);
 	UInstancedStaticMeshComponent* letter = NewObject<UInstancedStaticMeshComponent>(this, id);
 	letter->RegisterComponent();
-	letter->SetStaticMesh((dir % 2)  == 0 ? PlusMeshRef : MinusMeshRef);
+	letter->SetStaticMesh((dir % 2) == 0 ? PlusMeshRef : MinusMeshRef);
 	letter->SetFlags(RF_Transactional);
 	this->AddInstanceComponent(letter);
 	double letterX = CUBE_ACTUAL_SIZE * (0);
@@ -306,7 +323,7 @@ void AMazeBuild::clearBuild() {
  */
 void AMazeBuild::DisplayMaze() {
 	clearBuild();
-	walls.resize(GetMaze().getDepth()+1);
+	walls.resize(GetMaze().getDepth() + 1);
 	dimensionLetters.resize(GetMaze().getDepth() + 1);
 	dimensionLetter.resize(GetMaze().getDepth() + 1);
 	for (int z_loop = 0; z_loop < GetMaze().getDepth() + 1; z_loop++) {
@@ -327,22 +344,22 @@ void AMazeBuild::DisplayMaze() {
 	int aLoop = selectA;
 	int bLoop = selectB;
 	int cLoop = selectC;
-//	for (int aLoop = 0; aLoop < _maze->getASize(); aLoop++) {
-//		for (int bLoop = 0; bLoop < _maze->getBSize(); bLoop++) {
-//			for (int cLoop = 0; cLoop < _maze->getCSize(); cLoop++) {
-				for (int zLoop = 0; zLoop <= GetMaze().getDepth(); zLoop++) {
-					for (int yLoop = 0; yLoop <= GetMaze().getHeight(); yLoop++) {
-						for (int xLoop = 0; xLoop <= GetMaze().getWidth(); xLoop++) {
-							ProcessCell(Position(aLoop, bLoop, cLoop, zLoop, yLoop, xLoop));
-						}
-					}
-				}
-//			}
-//		}
-//	}
-	startText->SetActorLocation(positionToLocation(START));
+	//	for (int aLoop = 0; aLoop < _maze->getASize(); aLoop++) {
+	//		for (int bLoop = 0; bLoop < _maze->getBSize(); bLoop++) {
+	//			for (int cLoop = 0; cLoop < _maze->getCSize(); cLoop++) {
+	for (int zLoop = 0; zLoop <= GetMaze().getDepth(); zLoop++) {
+		for (int yLoop = 0; yLoop <= GetMaze().getHeight(); yLoop++) {
+			for (int xLoop = 0; xLoop <= GetMaze().getWidth(); xLoop++) {
+				ProcessCell(Position(aLoop, bLoop, cLoop, zLoop, yLoop, xLoop));
+			}
+		}
+	}
+	//			}
+	//		}
+	//	}
+	getStartText()->SetActorLocation(positionToLocation(START));
 	Position END = Position(0, 0, 0, GetMaze().getDepth() - 1, GetMaze().getHeight() - 1, GetMaze().getWidth() - 1);
-	endText->SetActorLocation(positionToLocation(END));
+	getEndText()->SetActorLocation(positionToLocation(END));
 }
 
 /**
@@ -413,22 +430,22 @@ void AMazeBuild::SetDimension(Position pos) {
 			}
 		}
 	}
-	startText->SetActorHiddenInGame(!(pos.getA() == 0 && pos.getB() == 0 && pos.getC() == 0));
-	endText->SetActorHiddenInGame(!(pos.getA() == GetMaze().getEnd().getA() && pos.getB() == GetMaze().getEnd().getB() && pos.getC() == GetMaze().getEnd().getC()));
+	getStartText()->SetActorHiddenInGame(!(pos.getA() == 0 && pos.getB() == 0 && pos.getC() == 0));
+	getEndText()->SetActorHiddenInGame(!(pos.getA() == GetMaze().getEnd().getA() && pos.getB() == GetMaze().getEnd().getB() && pos.getC() == GetMaze().getEnd().getC()));
 
 	int dimOffset = pos.getA() + pos.getB() + pos.getC();
-	WallMaterials[0]->SetScalarParameterValue("U_offset", (dimOffset +  0) % 3);
-	WallMaterials[0]->SetScalarParameterValue("V_offset", (dimOffset +  0) % 2);
-	WallMaterials[1]->SetScalarParameterValue("U_offset", (dimOffset +  1) % 3);
-	WallMaterials[1]->SetScalarParameterValue("V_offset", (dimOffset +  0) % 2);
-	WallMaterials[2]->SetScalarParameterValue("U_offset", (dimOffset +  2) % 3);
-	WallMaterials[2]->SetScalarParameterValue("V_offset", (dimOffset +  0) % 2);
-	WallMaterials[3]->SetScalarParameterValue("U_offset", (dimOffset +  0) % 3);
-	WallMaterials[3]->SetScalarParameterValue("V_offset", (dimOffset +  1) % 2);
-	WallMaterials[4]->SetScalarParameterValue("U_offset", (dimOffset +  1) % 3);
-	WallMaterials[4]->SetScalarParameterValue("V_offset", (dimOffset +  1) % 2);
-	WallMaterials[5]->SetScalarParameterValue("U_offset", (dimOffset +  2) % 3);
-	WallMaterials[5]->SetScalarParameterValue("V_offset", (dimOffset +  1) % 2);
+	WallMaterials[0]->SetScalarParameterValue("U_offset", (dimOffset + 0) % 3);
+	WallMaterials[0]->SetScalarParameterValue("V_offset", (dimOffset + 0) % 2);
+	WallMaterials[1]->SetScalarParameterValue("U_offset", (dimOffset + 1) % 3);
+	WallMaterials[1]->SetScalarParameterValue("V_offset", (dimOffset + 0) % 2);
+	WallMaterials[2]->SetScalarParameterValue("U_offset", (dimOffset + 2) % 3);
+	WallMaterials[2]->SetScalarParameterValue("V_offset", (dimOffset + 0) % 2);
+	WallMaterials[3]->SetScalarParameterValue("U_offset", (dimOffset + 0) % 3);
+	WallMaterials[3]->SetScalarParameterValue("V_offset", (dimOffset + 1) % 2);
+	WallMaterials[4]->SetScalarParameterValue("U_offset", (dimOffset + 1) % 3);
+	WallMaterials[4]->SetScalarParameterValue("V_offset", (dimOffset + 1) % 2);
+	WallMaterials[5]->SetScalarParameterValue("U_offset", (dimOffset + 2) % 3);
+	WallMaterials[5]->SetScalarParameterValue("V_offset", (dimOffset + 1) % 2);
 }
 
 /**
@@ -503,12 +520,34 @@ void AMazeBuild::changeWall() {
 void AMazeBuild::TriggerFireworks() {
 	FVector endLocation = positionToLocation(GetMaze().getEnd());
 	UGameplayStatics::SpawnEmitterAtLocation(this, FireworksParticleSystem, endLocation + FIREWORKS_DELTA_END_LOCATION[fireworksCount]);
-//	UGameplayStatics::PlaySound2D(this, FireworkSoundWave);
+	//	UGameplayStatics::PlaySound2D(this, FireworkSoundWave);
 	fireworksCount--;
 	playFireworksSound();
 	if (fireworksCount > 0) {
 		GetWorld()->GetTimerManager().SetTimer(TriggerFireworkTimerHandle, this, &AMazeBuild::TriggerFireworks, FIREWORKS_DELTA_TIME, false);
 	}
+}
+
+ATextRenderActor* AMazeBuild::getStartText()
+{
+	if (startText == NULL) {
+		startText = GetWorld()->SpawnActor<ATextRenderActor>(ATextRenderActor::StaticClass(), positionToLocation(START), FRotator(0.f, 0.f, 0.f));
+		startText->GetTextRender()->SetText(START_FTEXT);
+		startText->GetTextRender()->SetTextRenderColor(TERMINATION_COLOR);
+		startText->GetTextRender()->SetHorizontalAlignment(EHTA_Center);
+	}
+	return startText;
+}
+
+ATextRenderActor* AMazeBuild::getEndText()
+{
+	if (endText == NULL) {
+		endText = GetWorld()->SpawnActor<ATextRenderActor>(ATextRenderActor::StaticClass(), positionToLocation(START), FRotator(0.f, 0.f, 0.f));
+		endText->GetTextRender()->SetText(END_FTEXT);
+		endText->GetTextRender()->SetTextRenderColor(TERMINATION_COLOR);
+		endText->GetTextRender()->SetHorizontalAlignment(EHTA_Center);
+	}
+	return endText;
 }
 
 /**

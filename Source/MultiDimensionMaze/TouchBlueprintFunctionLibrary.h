@@ -1,3 +1,5 @@
+
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -5,6 +7,7 @@
 #include "maze_generator_core/Maze.h"
 #include "MazeBuild.h"
 #include "Components/CapsuleComponent.h"
+#include "Engine/EngineTypes.h"
 #include "Engine/SkyLight.h"
 #include "Components/SkyLightComponent.h"
 #include "GameFramework/Character.h"
@@ -29,149 +32,149 @@ UCLASS()
 class MULTIDIMENSIONMAZE_API UTouchBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasUp();
+	static bool hasUp();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasDown();
+	static bool hasDown();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasLeft();
+	static bool hasLeft();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasRight();
+	static bool hasRight();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasForward();
+	static bool hasForward();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasReverse();
+	static bool hasReverse();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasAPlus();
+	static bool hasAPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasAMinus();
+	static bool hasAMinus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasBPlus();
+	static bool hasBPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasBMinus();
+	static bool hasBMinus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasCPlus();
+	static bool hasCPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool hasCMinus();
+	static bool hasCMinus();
 
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool isUp();
+	static bool isUp();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static bool isDown();
+	static bool isDown();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void turnPlayerUp(bool isPress);
+	static void turnPlayerUp(bool isPress);
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void turnPlayerDown(bool isPress);
+	static void turnPlayerDown(bool isPress);
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void turnPlayerLeft(bool isPress);
+	static void turnPlayerLeft(bool isPress);
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void turnPlayerRight(bool isPress);
+	static void turnPlayerRight(bool isPress);
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void goPlayerForward(bool isPress);
+	static void goPlayerForward(bool isPress);
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void turnPlayerReverse(bool isPress);
+	static void turnPlayerReverse(bool isPress);
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickAPlus();
+	static void clickAPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickAMinus();
+	static void clickAMinus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickBPlus();
+	static void clickBPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickBMinus();
+	static void clickBMinus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickCPlus();
+	static void clickCPlus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static void clickCMinus();
+	static void clickCMinus();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getPlayerPositionADisplay();
+	static FString getPlayerPositionADisplay();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getPlayerPositionBDisplay();
+	static FString getPlayerPositionBDisplay();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getPlayerPositionCDisplay();
+	static FString getPlayerPositionCDisplay();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getPlayerPositionXDisplay();
+	static FString getPlayerPositionXDisplay();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getPlayerPositionYDisplay();
+	static FString getPlayerPositionYDisplay();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getPlayerPositionZDisplay();
+	static FString getPlayerPositionZDisplay();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getHint();
+	static FString getHint();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FString getOrientation();
+	static FString getOrientation();
 
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static int getPlayerPositionA();
+	static int getPlayerPositionA();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static int getPlayerPositionB();
+	static int getPlayerPositionB();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static int getPlayerPositionC();
+	static int getPlayerPositionC();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static int getPlayerPositionX();
+	static int getPlayerPositionX();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static int getPlayerPositionY();
+	static int getPlayerPositionY();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static int getPlayerPositionZ();
+	static int getPlayerPositionZ();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FVector getPlayerForward();
+	static FVector getPlayerForward();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static FVector getPlayerPosition();
+	static FVector getPlayerPosition();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static float getPlayerRotationPitch();
+	static float getPlayerRotationPitch();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static float getPlayerRotationYaw();
+	static float getPlayerRotationYaw();
 	UFUNCTION(BlueprintCallable, Category = "Dim")
-		static float getPlayerRotationRoll();
+	static float getPlayerRotationRoll();
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getASize();
+	static int getASize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getBSize();
+	static int getBSize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getCSize();
+	static int getCSize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getXSize();
+	static int getXSize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getYSize();
+	static int getYSize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getZSize();
+	static int getZSize();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getDimensionSize(int dimensionIndex);
+	static int getDimensionSize(int dimensionIndex);
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static int getDifficulty();
+	static int getDifficulty();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void updateSettings(int xSize, int ySize, int zSize, int aSize, int bSize, int cSize, int difficulty);
+	static void updateSettings(int xSize, int ySize, int zSize, int aSize, int bSize, int cSize, int difficulty);
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void initTutorialSettings();
+	static void initTutorialSettings();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void changeWall();
+	static void changeWall();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void newMap(AMazeBuild* mazeBuild, APlayerController* playerController, ASkyLight* skyLight, float animationDuration);
+	static void newMap(AMazeBuild* mazeBuild, APlayerController* playerController, ASkyLight* skyLight, float animationDuration);
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static bool isWin();
+	static bool isWin();
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static void MazeTick(float animationTime);
+	static void MazeTick(float animationTime);
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-		static FString getScore();
+	static FString getScore();
 
 	UFUNCTION(BlueprintCallable, Category = "State")
-		static void setTutorial(bool tutorial);
+	static void setTutorial(bool tutorial);
 	UFUNCTION(BlueprintCallable, Category = "State")
-		static bool isTutorial();
+	static bool isTutorial();
 	UFUNCTION(BlueprintCallable, Category = "State")
-		static void setDemo(bool demo);
+	static void setDemo(bool demo);
 	UFUNCTION(BlueprintCallable, Category = "State")
-		static bool isDemo();
+	static bool isDemo();
 	UFUNCTION(BlueprintCallable, Category = "State")
-		static void setTooltip(bool tooltip);
+	static void setTooltip(bool tooltip);
 	UFUNCTION(BlueprintCallable, Category = "State")
-		static bool isTooltip();
+	static bool isTooltip();
 	UFUNCTION(BlueprintCallable, Category = "State")
-		static void resetState();
+	static void resetState();
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetAppVersion"), Category = "Game Config")
+	static FString GetAppVersion();
 
-	UFUNCTION(BlueprintPure, Category = "Meta")
-		static FString getProjectVersion();
 
 	static void initMaze();
 	static void setPlayer(ACharacter* player);

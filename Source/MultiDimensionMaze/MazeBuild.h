@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/InstancedStaticMeshComponent.h"
 #include "UObject/UObjectGlobals.h"
 #include "maze_generator_core/dirs.h"
 #include <vector>
@@ -73,22 +73,22 @@ UCLASS()
 class MULTIDIMENSIONMAZE_API AMazeBuild : public AActor
 {
 	GENERATED_BODY()
-	
+
 public:
 	UPROPERTY()
-		class UParticleSystem* FireworksParticleSystem;
+	class UParticleSystem* FireworksParticleSystem;
 	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
-		void playFireworksSound();
+	void playFireworksSound();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
-		void startShowWin();
+	void startShowWin();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
-		void endShowWin();
+	void endShowWin();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
-		void displayRandSeed(int randSeed);
+	void displayRandSeed(int randSeed);
 	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
-		void displayDimensionTransition(float displayPercent);
+	void displayDimensionTransition(float displayPercent);
 	UFUNCTION(BlueprintImplementableEvent, Category = "Output")
-		void finishAnimation();
+	void finishAnimation();
 
 	static constexpr double CUBE_ACTUAL_SIZE = 80.0;
 	static constexpr double CUBE_SIZE = CUBE_ACTUAL_SIZE / DEFAULT_SIZE;
@@ -124,6 +124,8 @@ private:
 	void DisplayMaze();
 	void SetDimension(Position pos);
 	void TriggerFireworks();
+	ATextRenderActor* getStartText();
+	ATextRenderActor* getEndText();
 
 	UInstancedStaticMeshComponent* createWall(Direction dir, Position pos);
 	UInstancedStaticMeshComponent* createTermination(Direction dir, bool isStart);
@@ -160,7 +162,7 @@ private:
 private:
 	FTimerHandle TriggerFireworkTimerHandle;
 	int fireworksCount;
- 	std::vector<UMaterial*> DIMENSION_MATERIAL;
+	std::vector<UMaterial*> DIMENSION_MATERIAL;
 	std::vector<UInstancedStaticMeshComponent*> DIM_LETTERS;
 
 	FRotator DIM_LETTER_ROTATORS[12] = { NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, NO_ROTATOR, X_ROTATOR, X_ROTATOR, Y_ROTATOR, Y_ROTATOR, NO_ROTATOR, NO_ROTATOR };
